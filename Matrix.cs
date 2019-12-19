@@ -1313,5 +1313,34 @@ class Matrix
         }
         return output;
     }
+
+    /// <summary>
+    /// return the matrix as a 2D byte array
+    /// </summary>
+    /// <param name="matrix"></param>
+    /// <returns></returns>
+    public static byte[,] GetByteArray(Matrix matrix)
+    {
+        byte[,] result = new byte[matrix.Row,matrix.Column];
+        for (int row = 0; row < matrix.Row; row++)
+        {
+            for (int col = 0; col < matrix.Column; col++)
+            {
+                if(matrix[row,col]>255)
+                {
+                    result[row,col] = 255;
+                }
+                else if (matrix[row,col]<0)
+                {
+                    result[row,col] =0;
+                }
+                else
+                {
+                    result[row,col] = (byte)matrix[row,col];
+                }
+            }
+        }
+        return result;
+    }
 }
 

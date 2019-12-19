@@ -3,4 +3,5 @@ Matrix class
 
 2019/12/19
 1. Matrix convolution (x)
+2. GetByteArray (x)
 
