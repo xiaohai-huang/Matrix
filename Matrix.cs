@@ -1228,9 +1228,6 @@ class Matrix
         return max_matrix;
     }
 
-
-
-
     /// <summary>
     /// Save the matrix as a text file
     /// </summary>
@@ -1258,8 +1255,6 @@ class Matrix
         }
     }
 
-
-
     /// <summary>
     /// element-wise tanh, (e^z - e^-z)/(e^z + e^-z)
     /// </summary>
@@ -1268,17 +1263,14 @@ class Matrix
     public static Matrix tanh(Matrix Z)
     {
         Matrix result = new Matrix(Z.Shape);
-        // for (int row=0;row<result.Row;row++)
-        // {
-        //     for(int col=0;col<result.Column;col++)
-        //     {
-        //         result[row,col] = 
-        //     }
-        // }
         result = (Matrix.Exp(Z) - Matrix.Exp(-1 * Z)) / (Matrix.Exp(Z) + Matrix.Exp(-1 * Z));
         return result;
     }
 
+    public static Matrix Convolution(Matrix input, Matrix kernel)
+    {
+        throw new NotImplementedException();
+    }
 
 
 }
