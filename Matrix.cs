@@ -144,7 +144,7 @@ class Matrix
         _data = input;
     }
 
-    
+
     /// <summary>
     /// if input array has only 1 D,reshape it to two D array, e.g 784 => 28 * 28
     /// </summary>
@@ -1267,11 +1267,51 @@ class Matrix
         return result;
     }
 
+    /// <summary>
+    /// Convolution
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="kernel">a squared kernel</param>
+    /// <returns></returns>
     public static Matrix Convolution(Matrix input, Matrix kernel)
     {
-        throw new NotImplementedException();
+        // create a matrix with extra row and col
+        int extraLength = kernel.Row / 2;
+        int kernelLength = kernel.Row;
+
+        Matrix extendedMatrix = new Matrix(extraLength + input.Row + extraLength,
+                                           extraLength + input.Column + extraLength);
+
+        // fill the extended matrix using the input matrix
+        for (int row = 0; row < input.Row; row++)
+        {
+            for (int col = 0; col < input.Column; col++)
+            {
+                extendedMatrix[row + extraLength, col + extraLength] = input[row, col];
+            }
+        }
+
+        // create the output matrix which has the same size as input matrix
+        Matrix output = new Matrix(input.Shape);
+
+        // fill the output matrix by sliding over the input matrix
+        Matrix square = new Matrix(kernel.Shape);
+        for (int row = 0; row < output.Row; row++)
+        {
+            for (int col = 0; col < output.Column; col++)
+            {
+                // fill the square using the extended matrix
+                for (int i = 0; i < kernelLength; i++)
+                {
+                    for (int j = 0; j < kernelLength; j++)
+                    {
+                        square[i,j] = extendedMatrix[row+i,col+j];
+                    }
+                }
+                output[row,col] = Matrix.Sum(square * kernel)[0];
+            }
+        }
+        return output;
     }
-
-
 }
 
