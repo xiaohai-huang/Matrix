@@ -95,10 +95,8 @@ class Matrix
             }
             else
             {
-                Console.WriteLine("Invalid indexing");
-                throw new ArgumentException();
+                throw new ArgumentException("Invalid indexing");
             }
-
         }
         set
         {
@@ -109,11 +107,9 @@ class Matrix
             }
             else
             {
-                Console.WriteLine("Invalid indexing");
-                throw new ArgumentException();
+                throw new ArgumentException("Invalid indexing");
             }
         }
-
     }
 
     /// <summary>
@@ -345,19 +341,6 @@ class Matrix
         }
 
     }
-    private double Get_one_cell(int l_row_index, int r_col_index, Matrix R_matrix)
-    {
-        double sum = 0;
-
-        // because the left column has to be the same as the right row
-        // just use left row's length
-        for (int x = 0; x < this.Column; x++)
-        {
-            sum = sum + (this[l_row_index, x] * R_matrix[x, r_col_index]);
-        }
-
-        return sum;
-    }
 
     /// <summary>
     /// Matrix dot product
@@ -367,7 +350,6 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator *(Matrix left, Matrix right)
     {
-
         return left.Dot(right);
     }
 
@@ -483,7 +465,7 @@ class Matrix
         // for 1 x 1 matrix, expand the matrix
         if (right.Size == "1 X 1")
         {
-            right = new Matrix(left.Shape).Set_num(right[0]);
+            right = new Matrix(left.Shape).SetNum(right[0]);
         }
         Matrix result;
         result = left.Add(right);
@@ -499,7 +481,7 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator +(Matrix left, double right)
     {
-        Matrix right_matrix = new Matrix(left.Shape).Set_num(right);
+        Matrix right_matrix = new Matrix(left.Shape).SetNum(right);
         Matrix result = left + right_matrix;
         return result;
     }
@@ -513,7 +495,7 @@ class Matrix
     public static Matrix operator +(double left, Matrix right)
     {
         // shape has to be the same as the right matrix
-        Matrix left_matrix = new Matrix(right.Shape).Set_num(left);
+        Matrix left_matrix = new Matrix(right.Shape).SetNum(left);
         Matrix result = left_matrix + right;
         return result;
     }
@@ -563,7 +545,7 @@ class Matrix
         // trun the 1 x 1 to 5 x 5 first
         if (right.Size == "1 X 1")
         {
-            right = new Matrix(left.Shape).Set_num(right[0]);
+            right = new Matrix(left.Shape).SetNum(right[0]);
         }
         result = left.Substract(right);
 
@@ -578,7 +560,7 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator -(Matrix left, double right)
     {
-        Matrix right_matrix = new Matrix(left.Shape).Set_num(right);
+        Matrix right_matrix = new Matrix(left.Shape).SetNum(right);
         Matrix result = left - right_matrix;
         return result;
     }
@@ -592,7 +574,7 @@ class Matrix
     public static Matrix operator -(double left, Matrix right)
     {
         // shape has to be the same as the right matrix
-        Matrix left_matrix = new Matrix(right.Shape).Set_num(left);
+        Matrix left_matrix = new Matrix(right.Shape).SetNum(left);
         Matrix result = left_matrix - right;
         return result;
     }
@@ -674,7 +656,7 @@ class Matrix
     public static Matrix operator /(Matrix left, double right)
     {
         Matrix result = new Matrix(left.Shape);
-        Matrix right_matrix = new Matrix(left.Shape).Set_num(right);
+        Matrix right_matrix = new Matrix(left.Shape).SetNum(right);
 
         for (int row = 0; row < left.Row; row++)
         {
@@ -695,7 +677,7 @@ class Matrix
     public static Matrix operator /(double left, Matrix right)
     {
         Matrix result = new Matrix(right.Shape);
-        Matrix left_matrix = new Matrix(right.Shape).Set_num(left);
+        Matrix left_matrix = new Matrix(right.Shape).SetNum(left);
 
         for (int row = 0; row < right.Row; row++)
         {
@@ -814,7 +796,7 @@ class Matrix
     /// </summary>
     /// <param name="num">the number to set</param>
     /// <returns>a matrix which is full of the number</returns>
-    public Matrix Set_num(double num)
+    public Matrix SetNum(double num)
     {
         Matrix new_matrix = new Matrix(this.Shape);
         for (int row = 0; row < new_matrix.Row; row++)
@@ -897,14 +879,14 @@ class Matrix
     /// <summary>
     /// Display the matrix
     /// </summary>
-    /// <param name="decimal_num">the number of decimal spaces to use</param>
-    public void Display(int decimal_num = 2)
+    /// <param name="numDecimals">the number of decimal spaces to use</param>
+    public void Display(int numDecimals = 2)
     {
         for (int row = 0; row < this.Row; row++)
         {
             for (int col = 0; col < this.Column; col++)
             {
-                Console.Write(Math.Round(this[row, col], decimal_num) + "\t");
+                Console.Write(Math.Round(this[row, col], numDecimals) + "\t");
             }
             Console.WriteLine();
         }
@@ -1268,11 +1250,11 @@ class Matrix
     }
 
     /// <summary>
-    /// Convolution
+    /// Use the kernel to 'slides' across the input matrix
     /// </summary>
-    /// <param name="input"></param>
+    /// <param name="input">the input matrix</param>
     /// <param name="kernel">a squared kernel</param>
-    /// <returns></returns>
+    /// <returns>the matrix after convolution</returns>
     public static Matrix Convolution(Matrix input, Matrix kernel)
     {
         // create a matrix with extra row and col
@@ -1305,42 +1287,43 @@ class Matrix
                 {
                     for (int j = 0; j < kernelLength; j++)
                     {
-                        square[i,j] = extendedMatrix[row+i,col+j];
+                        square[i, j] = extendedMatrix[row + i, col + j];
                     }
                 }
-                output[row,col] = Matrix.Sum(square * kernel)[0];
+                output[row, col] = Matrix.Sum(square * kernel)[0];
             }
         }
         return output;
     }
 
     /// <summary>
-    /// return the matrix as a 2D byte array
+    /// Convert the matrix into a 2D byte array
     /// </summary>
-    /// <param name="matrix"></param>
-    /// <returns></returns>
+    /// <param name="matrix">the matrix to be converted</param>
+    /// <returns>a 2D byte array</returns>
     public static byte[,] GetByteArray(Matrix matrix)
     {
-        byte[,] result = new byte[matrix.Row,matrix.Column];
+        byte[,] result = new byte[matrix.Row, matrix.Column];
         for (int row = 0; row < matrix.Row; row++)
         {
             for (int col = 0; col < matrix.Column; col++)
             {
-                if(matrix[row,col]>255)
+                if (matrix[row, col] > 255)
                 {
-                    result[row,col] = 255;
+                    result[row, col] = 255;
                 }
-                else if (matrix[row,col]<0)
+                else if (matrix[row, col] < 0)
                 {
-                    result[row,col] =0;
+                    result[row, col] = 0;
                 }
                 else
                 {
-                    result[row,col] = (byte)matrix[row,col];
+                    result[row, col] = (byte)matrix[row, col];
                 }
             }
         }
         return result;
     }
+
 }
 
