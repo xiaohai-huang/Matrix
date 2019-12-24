@@ -153,7 +153,6 @@ class Matrix
             two_D_version_[0, 0] = one_D_array[0];
             two_D_version_[1, 0] = one_D_array[1];
             _data = two_D_version_;
-
         }
         else
         {
@@ -1255,7 +1254,7 @@ class Matrix
     /// <param name="input">the input matrix</param>
     /// <param name="kernel">a squared kernel</param>
     /// <returns>the matrix after convolution</returns>
-    public static Matrix Convolution(Matrix input, Matrix kernel)
+    public static Matrix Convolve(Matrix input, Matrix kernel)
     {
         // create a matrix with extra row and col
         int extraLength = kernel.Row / 2;
