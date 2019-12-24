@@ -752,7 +752,7 @@ class Matrix
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool Is_Equal(Matrix left, Matrix right)
+    public static bool IsEqual(Matrix left, Matrix right)
     {
         if (left.Size != right.Size)
         {
@@ -778,9 +778,9 @@ class Matrix
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public bool Is_Equal(Matrix right)
+    private bool IsEqual(Matrix right)
     {
-        if (Matrix.Is_Equal(this, right))
+        if (Matrix.IsEqual(this, right))
         {
             return true;
         }
@@ -896,7 +896,7 @@ class Matrix
     /// turn the whole matrix into a string, that can be directly save as a text file
     /// </summary>
     /// <returns>a string containing the whole matrix</returns>
-    public string Return_String()
+    public string ReturnString()
     {
         string text = "";
         for (int row = 0; row < this.Row; row++)
@@ -923,7 +923,7 @@ class Matrix
     /// </summary>
     /// <param name="col_index">the specific column</param>
     /// <returns>one column matrix</returns>
-    public Matrix Get_Column(int col_index)
+    public Matrix GetColumn(int col_index)
     {
         Matrix new_matrix = new Matrix(this.Row, 1);
         for (int row = 0; row < this.Row; row++)
@@ -938,7 +938,7 @@ class Matrix
     /// </summary>
     /// <param name="row_index">the index of the row</param>
     /// <returns>one row matrix</returns>
-    public Matrix Get_Row(int row_index)
+    public Matrix GetRow(int row_index)
     {
         Matrix new_matrix = new Matrix(row: 1, col: this.Column);
         for (int col = 0; col < this.Column; col++)
@@ -953,7 +953,7 @@ class Matrix
     /// </summary>
     /// <param name="col_index">the column's index to be removed</param>
     /// <returns>return a new matrix after removing</returns>
-    public Matrix Remove_Column(int col_index)
+    public Matrix RemoveColumn(int col_index)
     {
         Matrix result;
 
@@ -1003,14 +1003,14 @@ class Matrix
     /// <param name="col_index">start index</param>
     /// <param name="num_of_columns">number of columns to be removed</param>
     /// <returns></returns>
-    public Matrix Remove_Column(int col_index, int num_of_columns)
+    public Matrix RemoveColumn(int col_index, int num_of_columns)
     {
         // new col  = orgiranl col - num_of_cols to be removed
         Matrix new_matrix = this;
         int col_removed = 0;
         while (true)
         {
-            new_matrix = new_matrix.Remove_Column(col_index);
+            new_matrix = new_matrix.RemoveColumn(col_index);
             col_removed++;
             if (col_removed == num_of_columns) { break; }
         }
@@ -1023,7 +1023,7 @@ class Matrix
     /// </summary>
     /// <param name="row_index">the index of the row to be removed</param>
     /// <returns>return a new matrix after removing</returns>
-    public Matrix Remove_Row(int row_index)
+    public Matrix RemoveRow(int row_index)
     {
         Matrix result;
 
@@ -1064,7 +1064,7 @@ class Matrix
         }
 
         // combine top and bootom
-        result = top_matrix.Bottom_Concatenate(bottom_matrix);
+        result = top_matrix.BottomConcatenate(bottom_matrix);
 
         return result;
 
@@ -1076,14 +1076,14 @@ class Matrix
     /// <param name="row_index">start index</param>
     /// <param name="num_of_rows">how many rows to be removed</param>
     /// <returns>return a new matrix after removing</returns>
-    public Matrix Remove_Row(int row_index, int num_of_rows)
+    public Matrix RemoveRow(int row_index, int num_of_rows)
     {
         // new row  = orgiranl row - num_of_rows to be removed
         Matrix new_matrix = this;
         int row_removed = 0;
         while (true)
         {
-            new_matrix = new_matrix.Remove_Row(row_index);
+            new_matrix = new_matrix.RemoveRow(row_index);
             row_removed++;
             if (row_removed == num_of_rows) { break; }
         }
@@ -1128,7 +1128,7 @@ class Matrix
     /// </summary>
     /// <param name="bottom">the matrix to be concatenated from bottom</param>
     /// <returns>a taller matrix, vertically</returns>
-    public Matrix Bottom_Concatenate(Matrix bottom)
+    public Matrix BottomConcatenate(Matrix bottom)
     {
 
         // check column number
@@ -1166,7 +1166,7 @@ class Matrix
     /// <param name="matrix"></param>
     /// <param name="col_index"></param>
     /// <returns>the maximum value of the specific column</returns>
-    public static double Get_Max(Matrix matrix, int col_index)
+    public static double GetMax(Matrix matrix, int col_index)
     {
         double max = 0;
         int max_index = 0;
@@ -1198,7 +1198,7 @@ class Matrix
         List<double> max_list = new List<double>();
         for (int column_index = 0; column_index < matrix.Column; column_index++)
         {
-            max_list.Add(Get_Max(matrix, column_index));
+            max_list.Add(GetMax(matrix, column_index));
         }
 
         // populate the new matrix using the list which conatins maximum numbers
