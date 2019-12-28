@@ -198,14 +198,14 @@ class Matrix
     /// <summary>
     /// Construct a matrix using a text file
     /// </summary>
-    /// <param name="file_path">the file contains matrix</param>
-    public Matrix(string file_path)
+    /// <param name="filePath">the file contains matrix</param>
+    public Matrix(string filePath)
     {
         // get all the lines in the text file
-        string[] lines = System.IO.File.ReadAllLines(file_path);
+        string[] lines = System.IO.File.ReadAllLines(filePath);
 
         // extract the matrix part and store in a list, line by line
-        List<string> matrix_part = new List<string>();
+        List<string> matrixList = new List<string>();
 
         // get the matrix part, and remove the {},
         foreach (string line in lines)
@@ -222,52 +222,50 @@ class Matrix
             {
                 break;
             }
-            matrix_part.Add(line.Substring(1, line.Length - 3));//-2 means skip "},"
+            matrixList.Add(line.Substring(1, line.Length - 3));//-3 means skip "},"
         }
 
         // get the number of the columns
-        int col_num = matrix_part[0].Split(",").Length;
+        int numCols = matrixList[0].Split(",").Length;
 
-        // declare the matrix
-        double[,] matrix_arr = new double[matrix_part.Count, col_num];
+        double[,] matrixArr = new double[matrixList.Count, numCols];
         int row = 0;
-        try
+
+        foreach (string line in matrixList)
         {
-            foreach (string line in matrix_part)
+            string[] numStr = line.Split(",");
+            if (numStr.Length != numCols)
             {
-                string[] nums_str = line.Split(",");
-                if (nums_str.Length != col_num)
-                {
-                    // e.g.
-                    // {1,2,3},
-                    // {4,5},
-                    throw new Exception($"The length of column should be the same,\nColumn number: {nums_str.Length} is not eaqual to the other row's column number {col_num}");
-                }
-                for (int col = 0; col < nums_str.Length; col++)
-                {
-                    matrix_arr[row, col] = double.Parse(nums_str[col]);
-                }
-                row++;
+                // e.g.
+                // {1,2,3},
+                // {4,5},
+                throw new Exception($"The length of column should be the same,\n nColumn number: {numStr.Length}"+
+                $" is not eaqual to the other row's column number {numCols}");
             }
+            for (int col = 0; col < numStr.Length; col++)
+            {
+                try
+                {
+                    matrixArr[row, col] = double.Parse(numStr[col]);
+                }
+                catch (FormatException)
+                {
+                    // e.g. (1)
+                    // {1,2,3},
+                    // {4,5,d},
+                    // e.g. (2)
+                    // {1,2,3},
+                    // {4,5,},
+                    // e.g. (3)
+                    // {12,3}  miss ,
+                    throw new Exception("Matrix can only contain numbers");
+                }
+            }
+            row++;
         }
-        catch (IndexOutOfRangeException)
-        {
-            // e.g. 
-            // {1,2,3},
-            // {4,5,6,7},
-            throw new Exception("The length of row or column should be the same");
-        }
-        catch (FormatException)
-        {
-            // e.g. (1)
-            // {1,2,3},
-            // {4,5,d},
-            // e.g. (2)
-            // {1,2,3},
-            // {4,5,},
-            throw new Exception("Matrix can only contain numbers");
-        }
-        this._data = matrix_arr;
+
+
+        this._data = matrixArr;
     }
 
     /// <summary>
@@ -288,16 +286,16 @@ class Matrix
     /// <param name="row"></param>
     /// <param name="col"></param>
     /// <returns></returns>
-    public static Matrix Random_Matrix(int row, int col)
+    public static Matrix RandomMatrix(int row, int col)
     {
         Random rng = new Random();
         Matrix new_matrix = new Matrix(row, col);
-        for (int row_index = 0; row_index < new_matrix.Row; row_index++)
+        for (int rowIndex = 0; rowIndex < new_matrix.Row; rowIndex++)
         {
-            for (int col_index = 0; col_index < new_matrix.Column; col_index++)
+            for (int colIndex = 0; colIndex < new_matrix.Column; colIndex++)
             {
-                double random_num = rng.NextDouble() * 100;
-                new_matrix[row_index, col_index] = random_num;
+                double randomNum = rng.NextDouble() * 100;
+                new_matrix[rowIndex, colIndex] = randomNum;
             }
         }
         return new_matrix;
@@ -306,25 +304,25 @@ class Matrix
     /// <summary>
     /// matrix dot product
     /// </summary>
-    /// <param name="right_matrix"></param>
+    /// <param name="rightMatrix"></param>
     /// <returns></returns>
-    public Matrix Dot(Matrix right_matrix)
+    public Matrix Dot(Matrix rightMatrix)
     {
         Matrix output_matrix;
 
         // check whether row == col
-        if (this.Column == right_matrix.Row)//valid
+        if (this.Column == rightMatrix.Row)//valid
         {
-            output_matrix = new Matrix(row: this.Row, col: right_matrix.Column);// output matrix initialize
+            output_matrix = new Matrix(row: this.Row, col: rightMatrix.Column);// output matrix initialize
 
             for (int row = 0; row < this.Row; row++)
             {
-                for (int col = 0; col < right_matrix.Column; col++)
+                for (int col = 0; col < rightMatrix.Column; col++)
                 {
                     double cell = 0;
                     for (int l_col_index = 0; l_col_index < this.Column; l_col_index++)
                     {
-                        cell = cell + this[row, l_col_index] * right_matrix[l_col_index, col];
+                        cell = cell + this[row, l_col_index] * rightMatrix[l_col_index, col];
                     }
                     output_matrix[row, col] = cell;
                     //Get_one_cell(row, col,right_matrix)
@@ -335,7 +333,7 @@ class Matrix
         else// if input is invalid
         {
             Console.WriteLine("left [column] and right [row] is not the same");
-            Console.WriteLine($"{this.Column} != {right_matrix.Row}");
+            Console.WriteLine($"{this.Column} != {rightMatrix.Row}");
             throw new ArgumentException();
         }
 
@@ -848,7 +846,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Reshapre the matrix using column number only
+    /// Reshape the matrix using column number only
     /// </summary>
     /// <param name="col">the number of columns</param>
     /// <returns>a reshaped matrix</returns>
@@ -921,29 +919,29 @@ class Matrix
     /// <summary>
     /// turn the specific column into a new matrix (one column)
     /// </summary>
-    /// <param name="col_index">the specific column</param>
+    /// <param name="colIndex">the specific column</param>
     /// <returns>one column matrix</returns>
-    public Matrix GetColumn(int col_index)
+    public Matrix GetColumn(int colIndex)
     {
-        Matrix new_matrix = new Matrix(this.Row, 1);
+        Matrix newMatrix = new Matrix(this.Row, 1);
         for (int row = 0; row < this.Row; row++)
         {
-            new_matrix[row, 0] = this[row, col_index];
+            newMatrix[row, 0] = this[row, colIndex];
         }
-        return new_matrix;
+        return newMatrix;
     }
 
     /// <summary>
     /// turn the specific row into a new matrix (one row)
     /// </summary>
-    /// <param name="row_index">the index of the row</param>
+    /// <param name="rowIndex">the index of the row</param>
     /// <returns>one row matrix</returns>
-    public Matrix GetRow(int row_index)
+    public Matrix GetRow(int rowIndex)
     {
         Matrix new_matrix = new Matrix(row: 1, col: this.Column);
         for (int col = 0; col < this.Column; col++)
         {
-            new_matrix[0, col] = this[row_index, col];
+            new_matrix[0, col] = this[rowIndex, col];
         }
         return new_matrix;
     }
