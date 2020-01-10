@@ -391,25 +391,24 @@ class Matrix
     public Matrix Substract(Matrix rightMatrix)
     {
         Matrix result;
+        
         // check the size
-
         if (this.Size != rightMatrix.Size)
         {
             Console.WriteLine("Cannot substract these two matries");
             throw new ArgumentException($"Orginal: The size of left matrix: {this.Size} is not equal to the right matrix: {rightMatrix.Size}");
         }
-        else
-        {
-            result = new Matrix(this.Row, this.Column);
 
-            for (int row = 0; row < result.Row; row++)
+        result = new Matrix(this.Row, this.Column);
+
+        for (int row = 0; row < result.Row; row++)
+        {
+            for (int col = 0; col < result.Column; col++)
             {
-                for (int col = 0; col < result.Column; col++)
-                {
-                    result[row, col] = this[row, col] - rightMatrix[row, col];
-                }
+                result[row, col] = this[row, col] - rightMatrix[row, col];
             }
         }
+
         return result;
     }
 
@@ -763,7 +762,6 @@ class Matrix
         return result;
     }
 
-
     /// <summary>
     /// element wise, turn all number into absolute number. Size remain unchanged
     /// </summary>
@@ -798,11 +796,15 @@ class Matrix
                 result[row, col] = Math.Pow(matrix[row, col], num);
             }
         }
-
         return result;
     }
 
-    public static double Mean(Matrix matrix)
+    /// <summary>
+    /// Calculate the mean of the matrix
+    /// </summary>
+    /// <param name="matrix">the matrix to be calculated</param>
+    /// <returns></returns>
+    public static Matrix Mean(Matrix matrix)
     {
         double sum = 0;
         double n = matrix.Row * matrix.Column;
@@ -815,55 +817,56 @@ class Matrix
             }
         }
         mean = sum / n;
-        return mean;
+        Matrix result = new Matrix(1, 1).SetNum(mean);
+
+        return result;
     }
 
     /// <summary>
     /// element-wise Exp
     /// </summary>
     /// <param name="matrix"></param>
-    /// <returns></returns>
+    /// <returns>a matrix after calculation</returns>
     public static Matrix Exp(Matrix matrix)
     {
-        Matrix new_matrix = new Matrix(matrix.Shape);
+        Matrix newMatrix = new Matrix(matrix.Shape);
 
         for (int row = 0; row < matrix.Row; row++)
         {
             for (int col = 0; col < matrix.Column; col++)
             {
-                new_matrix[row, col] = Math.Exp(matrix[row, col]);
+                newMatrix[row, col] = Math.Exp(matrix[row, col]);//e^num
             }
         }
-        return new_matrix;
+        return newMatrix;
     }
 
     /// <summary>
-    /// element-wise log
+    /// element-wise natural log (base e)
     /// </summary>
     /// <param name="matrix"></param>
     /// <returns></returns>
     public static Matrix Log(Matrix matrix)
     {
 
-        Matrix new_matrix = new Matrix(matrix.Shape);
+        Matrix newMatrix = new Matrix(matrix.Shape);
 
         for (int row = 0; row < matrix.Row; row++)
         {
             for (int col = 0; col < matrix.Column; col++)
             {
-                new_matrix[row, col] = Math.Log(matrix[row, col]);
+                newMatrix[row, col] = Math.Log(matrix[row, col]);
             }
         }
-        return new_matrix;
+        return newMatrix;
 
     }
-
 
     /// <summary>
     /// element-wise tanh, (e^z - e^-z)/(e^z + e^-z)
     /// </summary>
     /// <param name="Z"></param>
-    /// <returns></returns>
+    /// <returns>a matrix which has the same dimension as input</returns>
     public static Matrix tanh(Matrix Z)
     {
         Matrix result = new Matrix(Z.Shape);
@@ -917,7 +920,6 @@ class Matrix
         }
         return output;
     }
-
 
     #endregion
 
@@ -1367,7 +1369,7 @@ class Matrix
 
         for (int col = 0; col < result.Column; col++)
         {
-            result[0,col] = Matrix.GetMax(matrix,col)[0];
+            result[0, col] = Matrix.GetMax(matrix, col)[0];
         }
 
         return result;
