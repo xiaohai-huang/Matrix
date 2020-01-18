@@ -14,3 +14,4 @@ Matrix class
 2020/1/18
 1. Implement static element-wise multiplication
 2. Modify double[] constructor
+3. Improve + for broadcasting
