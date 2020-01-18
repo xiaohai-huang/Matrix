@@ -10,3 +10,7 @@ Matrix class
 1. Implement ==,!=, GetHashCode, Equals
 2. TO DO: Improve GetMax(),---done!
 3. group methods using regions---done!
+
+2020/1/18
+1. Implement static element-wise multiplication
+2. Modify double[] constructor
