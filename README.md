@@ -17,3 +17,4 @@ Matrix class
 3. Improve + for broadcasting
 4. Rename Getdat => ToDoubleArray
 5. RandomMatrix change method variable name
+6. Create a helper method for broadcasting!!!
