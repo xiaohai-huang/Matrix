@@ -487,23 +487,97 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise addition
+    /// element-wise addition, broadcasting
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
     public static Matrix operator +(Matrix left, Matrix right)
     {
-        // for 1 x 1 matrix, expand the matrix
-        if (right.Size == "1 X 1")
+        // check size to perform broadcasting
+        if (left.Size != right.Size)
         {
-            right = new Matrix(left.Shape).SetNum(right[0]);
+            // for 1 x 1 matrix, expand the matrix
+            if (right.Size == "1 X 1")
+            {
+                right = new Matrix(left.Shape).SetNum(right[0]);
+            }
+            else if (left.Size == "1 X 1")
+            {
+                left = new Matrix(right.Shape).SetNum(left[0]);
+            }
+            // for two matries which have the same row and one of them has 1 column
+            // e.g. 4 X 100 and 4 X 1
+            else if (left.Shape[0] == right.Shape[0])// if row == row
+            {
+                if (left.Shape[1] == 1)// if the left matrix's column number is 1, Expands the left matrix
+                {
+                    Matrix rowAccumulator = new Matrix(1, right.Shape[1]);
+                    // One single row
+                    Matrix row;
+                    for (int i = 0; i < left.Row; i++)
+                    {
+                        row = new Matrix(1, right.Shape[1]).SetNum(left[i]);
+                        rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                    }
+                    // Remove the first row
+                    rowAccumulator = rowAccumulator.RemoveRow(0);
+                    left = rowAccumulator;
+                }
+                else // Expands the right matrix
+                {
+                    //if (right.Shape[1] == 1)
+                    // if the right matrix's column number is 1, Expands the right matrix
+
+                    Matrix rowAccumulator = new Matrix(1, left.Shape[1]);
+                    // One single row
+                    Matrix row;
+                    for (int i = 0; i < right.Row; i++)
+                    {
+                        row = new Matrix(1, left.Shape[1]).SetNum(right[i]);
+                        rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                    }
+                    // Remove the first row
+                    rowAccumulator = rowAccumulator.RemoveRow(0);
+                    right = rowAccumulator;
+
+                }
+            }
+            // e.g. 1 X 3 and 4 X 3
+            else if (left.Shape[1] == right.Shape[1])
+            {
+                Matrix rowAccumulator = new Matrix(1, left.Column);
+                if (left.Shape[0] == 1) // Expands left matrix by copying row down
+                {
+                    Matrix row = new Matrix(left.GetData());
+                    for (int i = 0; i < right.Row; i++)
+                    {
+                        rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                    }
+                    rowAccumulator = rowAccumulator.RemoveRow(0);
+                    left = rowAccumulator;
+                }
+                else // Expands the right matrix
+                {
+                    if (right.Shape[0] == 1) // Expands left matrix by copying row down
+                    {
+                        Matrix row = new Matrix(right.GetData());
+                        for (int i = 0; i < left.Row; i++)
+                        {
+                            rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                        }
+                        rowAccumulator = rowAccumulator.RemoveRow(0);
+                        right = rowAccumulator;
+                    }
+                }
+            }
         }
         Matrix result;
         result = left.Add(right);
 
         return result;
     }
+
 
 
     /// <summary>
