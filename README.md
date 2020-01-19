@@ -18,4 +18,4 @@ Matrix class
 4. Rename Getdata => ToDoubleArray ---done!
 5. RandomMatrix change method variable name ---done!
 6. Create a helper method for broadcasting!!!
-7 Implement Sum(matrix,axis=1)
+7. Implement Sum(matrix,axis=1)
