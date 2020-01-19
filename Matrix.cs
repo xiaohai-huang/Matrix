@@ -122,14 +122,7 @@ class Matrix
         }
     }
 
-    /// <summary>
-    /// Get the matrix as a double[,]
-    /// </summary>
-    /// <returns>a double[,] contains matrix values</returns>
-    public double[,] GetData()
-    {
-        return this._data;
-    }
+
 
     #endregion
 
@@ -153,63 +146,24 @@ class Matrix
         _data = input;
     }
 
-
     /// <summary>
-    /// if input array has only 1 D,reshape it to two D array, e.g 784 => 28 * 28
+    /// Constructs a one row matrix using a 1D double array
     /// </summary>
-    /// <param name="one_D_array">one dimension array</param>
-    public Matrix(double[] one_D_array)
+    /// <param name="input">one dimension array</param>
+    public Matrix(double[] input)
     {
-        if (one_D_array.Length == 2)
+        int numCols = input.GetLength(0);
+
+        Matrix matrix = new Matrix(1, numCols);
+        for (int col = 0; col < numCols; col++)
         {
-            double[,] two_D_version_ = new double[2, 1];
-            two_D_version_[0, 0] = one_D_array[0];
-            two_D_version_[1, 0] = one_D_array[1];
-            _data = two_D_version_;
+            matrix[1, col] = input[col];
         }
-        else
-        {
-            if (Math.Sqrt(one_D_array.Length) > (int)Math.Sqrt(one_D_array.Length))
-            {
-                throw new ArgumentException("The 1D array cannot be fully square rooted.");
-            }
-
-            // sqrt return a double
-            // in order to reshape an array, the array has to be ** 1/2
-            // not just /2 in length.
-            double[,] two_D_version = new double[(int)(Math.Sqrt(one_D_array.Length)), (int)(Math.Sqrt(one_D_array.Length))];
-            List<double> input_list = new List<double>();
-            for (int x = 0; x < one_D_array.Length; x++)
-            {
-                input_list.Add(one_D_array[x]);
-            }
-
-            int index = 0;
-
-            for (int row = 0; row < two_D_version.GetLength(0); row++)
-            {
-                for (int col = 0; col < two_D_version.GetLength(1); col++)
-                {
-                    try
-                    {
-                        two_D_version[row, col] = input_list[index];
-
-                    }
-                    catch
-                    {
-                        Console.WriteLine("out of range" + index);
-
-                    }
-                    index++;
-                }
-            }
-
-            _data = two_D_version;
-        }
+        _data = matrix.ToDoubleArray();
     }
 
     /// <summary>
-    /// Construct a matrix using a text file
+    /// Constructs a matrix using a text file
     /// </summary>
     /// <param name="filePath">the file contains matrix</param>
     public Matrix(string filePath)
@@ -302,16 +256,16 @@ class Matrix
     public static Matrix RandomMatrix(int row, int col)
     {
         Random rng = new Random();
-        Matrix new_matrix = new Matrix(row, col);
-        for (int rowIndex = 0; rowIndex < new_matrix.Row; rowIndex++)
+        Matrix result = new Matrix(row, col);
+        for (int rowIndex = 0; rowIndex < result.Row; rowIndex++)
         {
-            for (int colIndex = 0; colIndex < new_matrix.Column; colIndex++)
+            for (int colIndex = 0; colIndex < result.Column; colIndex++)
             {
                 double randomNum = rng.NextDouble() * 100;
-                new_matrix[rowIndex, colIndex] = randomNum;
+                result[rowIndex, colIndex] = randomNum;
             }
         }
-        return new_matrix;
+        return result;
     }
 
     #endregion
@@ -391,7 +345,7 @@ class Matrix
     public Matrix Substract(Matrix rightMatrix)
     {
         Matrix result;
-        
+
         // check the size
         if (this.Size != rightMatrix.Size)
         {
@@ -413,7 +367,7 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise multiplication
+    /// element-wise multiplication, broadcasting
     /// </summary>
     /// <param name="num">the number to be multiplied</param>
     /// <returns>new matrix</returns>
@@ -455,6 +409,16 @@ class Matrix
         return result;
     }
 
+    /// <summary>
+    /// Element-wise multiplication of two matries
+    /// </summary>
+    /// <param name="left">left matrix</param>
+    /// <param name="right">right matrix</param>
+    /// <returns>a matrix</returns>
+    public static Matrix Multiply(Matrix left, Matrix right)
+    {
+        return left.Multiply(right);
+    }
     // for overloadding == and !=
     public bool Equals(Matrix other)
     {
@@ -549,7 +513,7 @@ class Matrix
                 Matrix rowAccumulator = new Matrix(1, left.Column);
                 if (left.Shape[0] == 1) // Expands left matrix by copying row down
                 {
-                    Matrix row = new Matrix(left.GetData());
+                    Matrix row = new Matrix(left.ToDoubleArray());
                     for (int i = 0; i < right.Row; i++)
                     {
                         rowAccumulator = rowAccumulator.BottomConcatenate(row);
@@ -561,7 +525,7 @@ class Matrix
                 {
                     if (right.Shape[0] == 1) // Expands left matrix by copying row down
                     {
-                        Matrix row = new Matrix(right.GetData());
+                        Matrix row = new Matrix(right.ToDoubleArray());
                         for (int i = 0; i < left.Row; i++)
                         {
                             rowAccumulator = rowAccumulator.BottomConcatenate(row);
@@ -998,9 +962,27 @@ class Matrix
     #endregion
 
     #region Matrix Non-Static Methods
+    
+    /// <summary>
+    /// Gets the matrix as a double[,]
+    /// </summary>
+    /// <returns>a double[,] containing matrix values</returns>
+    public double[,] ToDoubleArray()
+    {
+        return this._data;
+    }
 
     /// <summary>
-    /// set all elements to a specific nummber
+    /// Gets the matrix as a byte[,]
+    /// </summary>
+    /// <returns>a byte[,] containing matrix values</returns>
+    public byte[,] ToByteArray()
+    {
+        return Matrix.ToByteArray(this);
+    }
+    
+    /// <summary>
+    /// Sets all elements to a specific nummber
     /// </summary>
     /// <param name="num">the number to set</param>
     /// <returns>a matrix which is full of the number</returns>
@@ -1454,7 +1436,7 @@ class Matrix
     /// </summary>
     /// <param name="matrix">the matrix to be converted</param>
     /// <returns>a 2D byte array</returns>
-    public static byte[,] GetByteArray(Matrix matrix)
+    public static byte[,] ToByteArray(Matrix matrix)
     {
         byte[,] result = new byte[matrix.Row, matrix.Column];
         for (int row = 0; row < matrix.Row; row++)
