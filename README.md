@@ -12,9 +12,10 @@ Matrix class
 3. group methods using regions---done!
 
 2020/1/18
-1. Implement static element-wise multiplication
-2. Modify double[] constructor
+1. Implement static element-wise multiplication ---done!
+2. Modify double[] constructor ---done!
 3. Improve + for broadcasting
-4. Rename Getdat => ToDoubleArray
-5. RandomMatrix change method variable name
+4. Rename Getdata => ToDoubleArray ---done!
+5. RandomMatrix change method variable name ---done!
 6. Create a helper method for broadcasting!!!
+7 Implement Sum(matrix,axis=1)
