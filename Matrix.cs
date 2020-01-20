@@ -128,7 +128,7 @@ class Matrix
 
     #region  Class Constructors
     /// <summary>
-    /// construct an empty matrix with specific row and column
+    /// Constructs an empty matrix with specific row and column
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
@@ -138,7 +138,7 @@ class Matrix
     }
 
     /// <summary>
-    /// construct a matrix using 2D array
+    /// Constructs a matrix using 2D array
     /// </summary>
     /// <param name="input">a 2D array</param>
     public Matrix(double[,] input)
