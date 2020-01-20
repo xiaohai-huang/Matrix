@@ -126,7 +126,7 @@ class Matrix
 
     #endregion
 
-    #region  Class Constructors
+    #region Class Constructors
     /// <summary>
     /// Constructs an empty matrix with specific row and column
     /// </summary>
@@ -165,74 +165,11 @@ class Matrix
     /// <summary>
     /// Constructs a matrix using a text file
     /// </summary>
-    /// <param name="filePath">the file contains matrix</param>
+    /// <param name="filePath">the binary data file containing a matrix</param>
     public Matrix(string filePath)
     {
-        // get all the lines in the text file
-        string[] lines = System.IO.File.ReadAllLines(filePath);
-
-        // extract the matrix part and store in a list, line by line
-        List<string> matrixList = new List<string>();
-
-        // get the matrix part, and remove the {},
-        foreach (string line in lines)
-        {
-            try// if empty break
-            {
-                // if it does not start with {, break the foreach loop
-                if (line.Substring(0, 1) != "{")// if not { break
-                {
-                    break;
-                }
-            }// try is for empty line, if it is an empty line also break
-            catch (ArgumentOutOfRangeException)
-            {
-                break;
-            }
-            matrixList.Add(line.Substring(1, line.Length - 3));//-3 means skip "},"
-        }
-
-        // get the number of the columns
-        int numCols = matrixList[0].Split(",").Length;
-
-        double[,] matrixArr = new double[matrixList.Count, numCols];
-        int row = 0;
-
-        foreach (string line in matrixList)
-        {
-            string[] numStr = line.Split(",");
-            if (numStr.Length != numCols)
-            {
-                // e.g.
-                // {1,2,3},
-                // {4,5},
-                throw new Exception($"The length of column should be the same,\n nColumn number: {numStr.Length}" +
-                $" is not eaqual to the other row's column number {numCols}");
-            }
-            for (int col = 0; col < numStr.Length; col++)
-            {
-                try
-                {
-                    matrixArr[row, col] = double.Parse(numStr[col]);
-                }
-                catch (FormatException)
-                {
-                    // e.g. (1)
-                    // {1,2,3},
-                    // {4,5,d},
-                    // e.g. (2)
-                    // {1,2,3},
-                    // {4,5,},
-                    // e.g. (3)
-                    // {12,3}  miss ,
-                    throw new Exception("Matrix can only contain numbers");
-                }
-            }
-            row++;
-        }
-
-
-        this._data = matrixArr;
+        // This uses the ArrayLoader class from ITD121 PST1
+        _data = Load2DArray(filePath);
     }
 
     /// <summary>
@@ -962,7 +899,7 @@ class Matrix
     #endregion
 
     #region Matrix Non-Static Methods
-    
+
     /// <summary>
     /// Gets the matrix as a double[,]
     /// </summary>
@@ -980,7 +917,7 @@ class Matrix
     {
         return Matrix.ToByteArray(this);
     }
-    
+
     /// <summary>
     /// Sets all elements to a specific nummber
     /// </summary>
@@ -1360,25 +1297,7 @@ class Matrix
     /// <param name="filePath"></param>
     public void SaveMatrix(string filePath)
     {
-        //string text_to_write = this.Return_String();
-        //WriteToFile(text_to_write,file_path);
-        using (StreamWriter sr = new StreamWriter(filePath))
-        {
-            for (int row = 0; row < this.Row; row++)
-            {
-                sr.Write("{");
-                for (int col = 0; col < this.Column; col++)
-                {
-                    if (col == this.Column - 1)
-                    {
-                        sr.Write(this[row, col]);
-                    }
-                    else { sr.Write(this[row, col] + ","); }
-                }
-                sr.Write("},");
-                sr.WriteLine();
-            }
-        }
+        Save2DArray(this._data,filePath);
     }
 
 
@@ -1460,6 +1379,73 @@ class Matrix
         return result;
     }
 
+    #endregion
+
+    #region External Helper Methods
+
+    // ===========For Load and Save matrix===========
+    private static byte[] DoubleArrToBytes(double[,] arr)
+    {
+        byte[] bytes = new byte[arr.GetLength(0) * arr.GetLength(1) * 8];
+
+        for (int i = 0; i < bytes.Length; i += 8)
+        {
+            int id = i / 8;
+            int row = id / arr.GetLength(1);
+            int col = id % arr.GetLength(1);
+
+            byte[] b = BitConverter.GetBytes(arr[row, col]);
+            for (int j = i; j < i + 8; j++)
+            {
+                bytes[j] = b[j - i];
+            }
+        }
+
+        return bytes;
+    }
+    private static void Save2DArray(double[,] arr, string path)
+    {
+        byte[] dim1Bytes = BitConverter.GetBytes((double)arr.GetLength(0));
+        byte[] dim2Bytes = BitConverter.GetBytes((double)arr.GetLength(1));
+        byte[] dataBytes = DoubleArrToBytes(arr);
+        byte[] allBytes = new byte[dim1Bytes.Length + dim2Bytes.Length + dataBytes.Length];
+        Array.Copy(dim1Bytes, 0, allBytes, 0, dim1Bytes.Length);
+        Array.Copy(dim2Bytes, 0, allBytes, 8, dim2Bytes.Length);
+        Array.Copy(dataBytes, 0, allBytes, 16, dataBytes.Length);
+        System.IO.File.WriteAllBytes(path, allBytes);
+    }
+    private static double[] ByteArrToDouble(byte[] bytes)
+    {
+        double[] arr = new double[bytes.Length / 8];
+        for (int i = 0; i < bytes.Length; i += 8)
+        {
+            arr[i / 8] = BitConverter.ToDouble(bytes, i);
+        }
+        return arr;
+    }
+    private static double[,] Load2DArray(string path)
+    {
+        byte[] allBytes = System.IO.File.ReadAllBytes(path);
+        byte[] dataBytes = new byte[allBytes.Length - 16];
+        Array.Copy(allBytes, 16, dataBytes, 0, dataBytes.Length);
+
+        double dim1 = BitConverter.ToDouble(allBytes, 0);
+        double dim2 = BitConverter.ToDouble(allBytes, 8);
+
+        double[] arr1D = ByteArrToDouble(dataBytes);
+        double[,] arr2D = new double[(int)dim1, (int)dim2];
+        for (int row = 0; row < arr2D.GetLength(0); row++)
+        {
+            for (int col = 0; col < arr2D.GetLength(1); col++)
+            {
+                arr2D[row, col] = arr1D[row * arr2D.GetLength(0) + col];
+            }
+        }
+        return arr2D;
+    }
+
+    // ===========For Load and Save matrix===========
+    
     #endregion
 }
 

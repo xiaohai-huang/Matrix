@@ -20,4 +20,4 @@ Matrix class
 6. Create a helper method for broadcasting!!!
 7. Implement Sum(matrix,axis=1)
 8. Improve SaveMatrix, and a matrix constructor using txt file as a parameter. Use binary file instead.
-  see PST1.!!!!
+  see PST1.!!!! ---done!
