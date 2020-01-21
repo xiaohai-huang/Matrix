@@ -163,7 +163,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Constructs a matrix using a text file
+    /// Constructs a matrix using a data file
     /// </summary>
     /// <param name="filePath">the binary data file containing a matrix</param>
     public Matrix(string filePath)
@@ -1292,7 +1292,7 @@ class Matrix
 
 
     /// <summary>
-    /// Save the matrix as a text file
+    /// Save the matrix as a data file
     /// </summary>
     /// <param name="filePath"></param>
     public void SaveMatrix(string filePath)
