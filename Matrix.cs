@@ -185,7 +185,15 @@ class Matrix
     }
 
     /// <summary>
-    /// Create a matrix with random numbers
+    /// Constructs a new matrix by copying the input matrix
+    /// </summary>
+    /// <param name="matrix">the matrix to be cloned</param>
+    public Matrix(Matrix matrix)
+    {
+        _data = matrix.ToDoubleArray();
+    }
+    /// <summary>
+    /// Creates a matrix with random numbers
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
@@ -204,6 +212,8 @@ class Matrix
         }
         return result;
     }
+
+
 
     #endregion
 
@@ -1056,12 +1066,12 @@ class Matrix
     /// <returns>one column matrix</returns>
     public Matrix GetColumn(int colIndex)
     {
-        Matrix newMatrix = new Matrix(this.Row, 1);
+        Matrix column = new Matrix(this.Row, 1);
         for (int row = 0; row < this.Row; row++)
         {
-            newMatrix[row, 0] = this[row, colIndex];
+            column[row, 0] = this[row, colIndex];
         }
-        return newMatrix;
+        return column;
     }
 
     /// <summary>
@@ -1071,12 +1081,12 @@ class Matrix
     /// <returns>one row matrix</returns>
     public Matrix GetRow(int rowIndex)
     {
-        Matrix new_matrix = new Matrix(row: 1, col: this.Column);
+        Matrix row = new Matrix(1, this.Column);
         for (int col = 0; col < this.Column; col++)
         {
-            new_matrix[0, col] = this[rowIndex, col];
+            row[0, col] = this[rowIndex, col];
         }
-        return new_matrix;
+        return row;
     }
 
     /// <summary>
@@ -1129,7 +1139,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Remove a range of columns based on the number given
+    /// Removes a range of columns based on the number given
     /// </summary>
     /// <param name="colIndex">start index</param>
     /// <param name="numColToBeRemoved">number of columns to be removed</param>
@@ -1137,7 +1147,7 @@ class Matrix
     public Matrix RemoveColumn(int colIndex, int numColToBeRemoved)
     {
         // new col  = orgiranl col - num_of_cols to be removed
-        Matrix matrix = new Matrix(this.Shape);
+        Matrix matrix = new Matrix(this);
         int numColRemoved = 0;
         while (true)
         {
@@ -1201,15 +1211,15 @@ class Matrix
     }
 
     /// <summary>
-    /// Remove a range of rows in the matrix
+    /// Removes a range of rows in the matrix
     /// </summary>
     /// <param name="rowIndex">start index</param>
     /// <param name="numRows">how many rows to be removed</param>
-    /// <returns>return a new matrix after removing</returns>
+    /// <returns>returns a new matrix after removing</returns>
     public Matrix RemoveRow(int rowIndex, int numRows)
     {
         // new row  = orgiranl row - num_of_rows to be removed
-        Matrix new_matrix = new Matrix(this.Shape);
+        Matrix new_matrix = new Matrix(this);
         int row_removed = 0;
         while (true)
         {
