@@ -74,7 +74,7 @@ class Matrix
 
     //[] overload
     /// <summary>
-    /// get the element of the matrix using the given row and col index
+    /// Gets the element of the matrix using the given row and col index
     /// </summary>
     /// <value></value>
     public double this[int row, int col]
@@ -88,7 +88,6 @@ class Matrix
         {
             _data[row, col] = value;
         }
-
     }
 
     /// <summary>
@@ -138,9 +137,9 @@ class Matrix
     }
 
     /// <summary>
-    /// Constructs a matrix using 2D array
+    /// Constructs a matrix using 2D double array
     /// </summary>
-    /// <param name="input">a 2D array</param>
+    /// <param name="input">a 2D double array</param>
     public Matrix(double[,] input)
     {
         _data = input;
@@ -149,7 +148,7 @@ class Matrix
     /// <summary>
     /// Constructs a one row matrix using a 1D double array
     /// </summary>
-    /// <param name="input">one dimension array</param>
+    /// <param name="input">one dimension double array</param>
     public Matrix(double[] input)
     {
         int numCols = input.GetLength(0);
@@ -499,8 +498,8 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator +(Matrix left, double right)
     {
-        Matrix right_matrix = new Matrix(left.Shape).SetNum(right);
-        Matrix result = left + right_matrix;
+        Matrix rightMatrix = new Matrix(left.Shape).SetNum(right);
+        Matrix result = left + rightMatrix;
         return result;
     }
 
@@ -513,8 +512,8 @@ class Matrix
     public static Matrix operator +(double left, Matrix right)
     {
         // shape has to be the same as the right matrix
-        Matrix left_matrix = new Matrix(right.Shape).SetNum(left);
-        Matrix result = left_matrix + right;
+        Matrix leftMatrix = new Matrix(right.Shape).SetNum(left);
+        Matrix result = leftMatrix + right;
         return result;
     }
 
@@ -601,13 +600,13 @@ class Matrix
     public static Matrix operator /(Matrix left, double right)
     {
         Matrix result = new Matrix(left.Shape);
-        Matrix right_matrix = new Matrix(left.Shape).SetNum(right);
+        Matrix rightMatrix = new Matrix(left.Shape).SetNum(right);
 
         for (int row = 0; row < left.Row; row++)
         {
             for (int col = 0; col < left.Column; col++)
             {
-                result[row, col] = left[row, col] / right_matrix[row, col];
+                result[row, col] = left[row, col] / rightMatrix[row, col];
             }
         }
         return result;
@@ -622,13 +621,13 @@ class Matrix
     public static Matrix operator /(double left, Matrix right)
     {
         Matrix result = new Matrix(right.Shape);
-        Matrix left_matrix = new Matrix(right.Shape).SetNum(left);
+        Matrix leftMatrix = new Matrix(right.Shape).SetNum(left);
 
         for (int row = 0; row < right.Row; row++)
         {
             for (int col = 0; col < right.Column; col++)
             {
-                result[row, col] = left_matrix[row, col] / right[row, col];
+                result[row, col] = leftMatrix[row, col] / right[row, col];
             }
         }
         return result;
@@ -730,8 +729,9 @@ class Matrix
     #endregion
 
     #region Math Functions
+
     /// <summary>
-    /// return the sum of the whole matrix as a 1 x 1 matrix
+    /// Returns the sum of the whole matrix as a 1 x 1 matrix
     /// </summary>
     /// <returns>1 X 1 Matrix</returns>
     public static Matrix Sum(Matrix matrix)
@@ -745,6 +745,50 @@ class Matrix
             }
         }
         return result;
+    }
+
+    /// <summary>
+    /// Sum the matrix according to axis (row or column)
+    /// </summary>
+    /// <param name="matrix">the matrix to be operated</param>
+    /// <param name="axis">0 or 1, row or column</param>
+    /// <returns>sum</returns>
+    public static Matrix Sum(Matrix matrix, int axis)
+    {
+        Matrix result;
+
+        // 0 2 4
+        // 1 3 5
+        // =====
+        // 1 5 9
+        if (axis == 0) // sums down the rows 
+        {
+            result = new Matrix(1, matrix.Column);
+            Matrix column;
+            for (int col = 0; col < matrix.Column; col++)
+            {
+                column = matrix.GetColumn(col);
+                double rowSum = Matrix.Sum(column)[0];
+                result[0,col] = rowSum;
+            }
+            return result;
+        }
+        else if (axis == 1) // sums across the columns
+        {
+            result = new Matrix(matrix.Row,1);
+            Matrix row;
+            for(int rowIndex =0;rowIndex<matrix.Row;rowIndex++)
+            {
+                row = matrix.GetRow(rowIndex);
+                double colSum = Matrix.Sum(row)[0];
+                result[rowIndex,0] = colSum;
+            }
+            return result;
+        }
+        else
+        {
+            throw new ArgumentException("Axis can only be 1 or 2, row or column");
+        }
     }
 
     /// <summary>
@@ -785,7 +829,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Calculate the mean of the matrix
+    /// Calculates the mean of the matrix
     /// </summary>
     /// <param name="matrix">the matrix to be calculated</param>
     /// <returns></returns>
@@ -808,7 +852,7 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise Exp
+    /// element-wise Exp, e^matrix
     /// </summary>
     /// <param name="matrix"></param>
     /// <returns>a matrix after calculation</returns>
@@ -844,7 +888,6 @@ class Matrix
             }
         }
         return newMatrix;
-
     }
 
     /// <summary>
@@ -860,7 +903,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Use the kernel to 'slides' across the input matrix
+    /// Uses the kernel to 'slides' across the input matrix
     /// </summary>
     /// <param name="input">the input matrix</param>
     /// <param name="kernel">a squared kernel</param>
@@ -961,32 +1004,32 @@ class Matrix
             return this;
         }
         // create a list to store original matrix values (each cell)
-        List<double> original_values = new List<double>();
-        for (int original_row = 0; original_row < this.Row; original_row++)
+        List<double> originalValues = new List<double>();
+        for (int originalRow = 0; originalRow < this.Row; originalRow++)
         {
-            for (int orginal_col = 0; orginal_col < this.Column; orginal_col++)
+            for (int originalCol = 0; originalCol < this.Column; originalCol++)
             {
-                original_values.Add(this[original_row, orginal_col]);
+                originalValues.Add(this[originalRow, originalCol]);
             }
         }
 
-        Matrix shapped_matrix;
-        shapped_matrix = new Matrix(row, col);
-        int list_index = 0;
+        Matrix shappedMatrix;
+        shappedMatrix = new Matrix(row, col);
+        int listIndex = 0;
 
-        for (int shapped_row = 0; shapped_row < shapped_matrix.Row; shapped_row++)
+        for (int shappedRow = 0; shappedRow < shappedMatrix.Row; shappedRow++)
         {
-            for (int shapped_col = 0; shapped_col < shapped_matrix.Column; shapped_col++)
+            for (int shappedCol = 0; shappedCol < shappedMatrix.Column; shappedCol++)
             {
-                shapped_matrix[shapped_row, shapped_col] = original_values[list_index];
-                list_index++;
+                shappedMatrix[shappedRow, shappedCol] = originalValues[listIndex];
+                listIndex++;
             }
         }
-        return shapped_matrix;
+        return shappedMatrix;
     }
 
     /// <summary>
-    /// Reshape the matrix using column number only
+    /// Reshapes the matrix using column number only
     /// </summary>
     /// <param name="col">the number of columns</param>
     /// <returns>a reshaped matrix</returns>
@@ -1004,7 +1047,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Return a string conatining "Row X Column"
+    /// Returns a string conatining "Row X Column"
     /// </summary>
     /// <returns>"Row X Column"</returns>
     public override string ToString()
@@ -1034,7 +1077,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Convert the whole matrix into a string, that can be directly save as a text file
+    /// Converts the whole matrix into a string, that can be directly save as a text file
     /// </summary>
     /// <returns>a string containing the whole matrix</returns>
     public string ReturnString()
@@ -1060,7 +1103,7 @@ class Matrix
     }
 
     /// <summary>
-    /// turn the specific column into a new matrix (one column)
+    /// Gets the specific column as a new matrix (one column)
     /// </summary>
     /// <param name="colIndex">the specific column</param>
     /// <returns>one column matrix</returns>
@@ -1075,7 +1118,7 @@ class Matrix
     }
 
     /// <summary>
-    /// turn the specific row into a new matrix (one row)
+    /// Gets the specific row as a new matrix (one row)
     /// </summary>
     /// <param name="rowIndex">the index of the row</param>
     /// <returns>one row matrix</returns>
@@ -1090,7 +1133,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Remove a specific column in the matrix
+    /// Removes a specific column in the matrix
     /// </summary>
     /// <param name="colIndex">the column's index to be removed</param>
     /// <returns>return a new matrix after removing</returns>
@@ -1112,29 +1155,29 @@ class Matrix
             return result;
         }
         // deal with col index != 0
-        Matrix left_matrix = new Matrix(this.Row, colIndex);
-        Matrix right_matrix = new Matrix(this.Row, this.Column - colIndex - 1);
+        Matrix leftMatrix = new Matrix(this.Row, colIndex);
+        Matrix rightMatrix = new Matrix(this.Row, this.Column - colIndex - 1);
 
         // populate the left matrix
-        for (int row = 0; row < left_matrix.Row; row++)
+        for (int row = 0; row < leftMatrix.Row; row++)
         {
-            for (int col = 0; col < left_matrix.Column; col++)
+            for (int col = 0; col < leftMatrix.Column; col++)
             {
-                left_matrix[row, col] = this[row, col];
+                leftMatrix[row, col] = this[row, col];
             }
         }
 
         // populate the right matrix
-        for (int row = 0; row < right_matrix.Row; row++)
+        for (int row = 0; row < rightMatrix.Row; row++)
         {
-            for (int col = 0; col < right_matrix.Column; col++)
+            for (int col = 0; col < rightMatrix.Column; col++)
             {
-                right_matrix[row, col] = this[row, col + colIndex + 1];
+                rightMatrix[row, col] = this[row, col + colIndex + 1];
             }
         }
 
         // combine left and right
-        result = left_matrix.Concatenate(right_matrix);
+        result = leftMatrix.Concatenate(rightMatrix);
         return result;
     }
 
@@ -1159,7 +1202,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Remove a specific row in the matrix
+    /// Removes a specific row in the matrix
     /// </summary>
     /// <param name="rowIndex">the index of the row to be removed</param>
     /// <returns>return a new matrix after removing</returns>
@@ -1219,18 +1262,18 @@ class Matrix
     public Matrix RemoveRow(int rowIndex, int numRows)
     {
         // new row  = orgiranl row - num_of_rows to be removed
-        Matrix new_matrix = new Matrix(this);
-        int row_removed = 0;
+        Matrix newMatrix = new Matrix(this);
+        int rowRemoved = 0;
         while (true)
         {
-            new_matrix = new_matrix.RemoveRow(rowIndex);
-            row_removed++;
-            if (row_removed == numRows) { break; }
+            newMatrix = newMatrix.RemoveRow(rowIndex);
+            rowRemoved++;
+            if (rowRemoved == numRows) { break; }
         }
-        return new_matrix;
+        return newMatrix;
     }
     /// <summary>
-    /// Concatenate two matries together,left to right
+    /// Concatenates two matries together,left to right
     /// </summary>
     /// <param name="right">the matrix to be combined</param>
     /// <returns>return the combined matrix, horizontally</returns>
@@ -1241,13 +1284,13 @@ class Matrix
         {
             throw new ArgumentException($"{this.Row}!={right.Row}\n row number has to be the same");
         }
-        Matrix new_matrix = new Matrix(this.Row, this.Column + right.Column);
+        Matrix newMatrix = new Matrix(this.Row, this.Column + right.Column);
         // populate the new matrix by using the left matrix
         for (int row = 0; row < this.Row; row++)
         {
             for (int col = 0; col < this.Column; col++)
             {
-                new_matrix[row, col] = this[row, col];
+                newMatrix[row, col] = this[row, col];
             }
         }
 
@@ -1256,15 +1299,15 @@ class Matrix
         {
             for (int col = this.Column; col < this.Column + right.Column; col++)
             {
-                new_matrix[row, col] = right[row, col - this.Column];
+                newMatrix[row, col] = right[row, col - this.Column];
             }
         }
-        return new_matrix;
+        return newMatrix;
 
     }
 
     /// <summary>
-    /// Concatenate the matrix together, top to bottom
+    /// Concatenates the matrix together, top to bottom
     /// </summary>
     /// <param name="bottom">the matrix to be concatenated from bottom</param>
     /// <returns>a taller matrix, vertically</returns>
@@ -1307,7 +1350,7 @@ class Matrix
     /// <param name="filePath"></param>
     public void SaveMatrix(string filePath)
     {
-        Save2DArray(this._data,filePath);
+        Save2DArray(this._data, filePath);
     }
 
 
@@ -1316,7 +1359,7 @@ class Matrix
     #region Matrix Static Methods
 
     /// <summary>
-    /// Get the max value of the column according to the given index
+    /// Gets the max value of the column according to the given index
     /// </summary>
     /// <param name="matrix"></param>
     /// <param name="colIndex"></param>
@@ -1339,10 +1382,10 @@ class Matrix
     }
 
     /// <summary>
-    /// find the index with max score in each column and turn into 1 row matrix
+    /// Find the index with max value in each column and turn into 1 row matrix
     /// </summary>
     /// <param name="matrix">The matrix to be searched</param>
-    /// <returns>Return an one row matrix</returns>
+    /// <returns>Returns an one row matrix</returns>
     public static Matrix GetMax(Matrix matrix)
     {
         const int NUM_ROWS_TO_RETURN = 1;
@@ -1361,7 +1404,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Convert the matrix into a 2D byte array
+    /// Converts the matrix into a 2D byte array
     /// </summary>
     /// <param name="matrix">the matrix to be converted</param>
     /// <returns>a 2D byte array</returns>
@@ -1454,7 +1497,7 @@ class Matrix
     }
 
     // ===========For Load and Save matrix===========
-    
+
     #endregion
 }
 

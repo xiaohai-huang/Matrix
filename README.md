@@ -18,6 +18,11 @@ Matrix class
 4. Rename Getdata => ToDoubleArray ---done!
 5. RandomMatrix change method variable name ---done!
 6. Create a helper method for broadcasting!!!
-7. Implement Sum(matrix,axis=1)
+7. Implement Sum(matrix,axis=1) ---done!
 8. Improve SaveMatrix, and a matrix constructor using txt file as a parameter. Use binary file instead.
   see PST1.!!!! ---done!
+
+2020/1/22
+1. matrix file constructor, be able to handle two types of files
+  txt, data
+
