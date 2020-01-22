@@ -1137,7 +1137,7 @@ class Matrix
     public Matrix RemoveColumn(int colIndex, int numColToBeRemoved)
     {
         // new col  = orgiranl col - num_of_cols to be removed
-        Matrix matrix = this;
+        Matrix matrix = new Matrix(this.Shape);
         int numColRemoved = 0;
         while (true)
         {
@@ -1209,7 +1209,7 @@ class Matrix
     public Matrix RemoveRow(int rowIndex, int numRows)
     {
         // new row  = orgiranl row - num_of_rows to be removed
-        Matrix new_matrix = this;
+        Matrix new_matrix = new Matrix(this.Shape);
         int row_removed = 0;
         while (true)
         {
@@ -1292,7 +1292,7 @@ class Matrix
 
 
     /// <summary>
-    /// Save the matrix as a data file
+    /// Saves the matrix as a data file
     /// </summary>
     /// <param name="filePath"></param>
     public void SaveMatrix(string filePath)
@@ -1400,7 +1400,6 @@ class Matrix
                 bytes[j] = b[j - i];
             }
         }
-
         return bytes;
     }
     private static void Save2DArray(double[,] arr, string path)
