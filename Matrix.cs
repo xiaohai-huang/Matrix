@@ -1490,7 +1490,8 @@ class Matrix
         {
             for (int col = 0; col < arr2D.GetLength(1); col++)
             {
-                arr2D[row, col] = arr1D[row * arr2D.GetLength(0) + col];
+                // Changes GetLength() from 0 to 1
+                arr2D[row, col] = arr1D[row * arr2D.GetLength(1) + col];
             }
         }
         return arr2D;
