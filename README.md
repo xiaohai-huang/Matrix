@@ -7,7 +7,7 @@ Matrix class
 2. GetByteArray (x)
 
 2020/1/9
-1. Implement ==,!=, GetHashCode, Equals
+1. Implement ==,!=, GetHashCode, Equals---done!
 2. TO DO: Improve GetMax(),---done!
 3. group methods using regions---done!
 
@@ -24,5 +24,5 @@ Matrix class
 
 2020/1/22
 1. matrix file constructor, be able to handle two types of files
-  txt, data
+  txt, data ---done!
 

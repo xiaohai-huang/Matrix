@@ -162,13 +162,51 @@ class Matrix
     }
 
     /// <summary>
-    /// Constructs a matrix using a data file
+    /// Constructs a matrix using a data file or text file
     /// </summary>
-    /// <param name="filePath">the binary data file containing a matrix</param>
+    /// <param name="filePath">the file containing a matrix</param>
     public Matrix(string filePath)
     {
-        // This uses the ArrayLoader class from ITD121 PST1
-        _data = Load2DArray(filePath);
+        bool isDataFile = CheckFileExtension(filePath,"data");
+        bool isTextFile = CheckFileExtension(filePath,"txt");
+        // if input is a data file
+        if(isDataFile)
+        {
+            // This uses the ArrayLoader class from ITD121 PST1
+            _data = Load2DArray(filePath);
+        }
+        else if (isTextFile)// The delimiter is ,
+        {
+            char delimiter = ',';
+            // Loads data from the text file
+            string[] lines = File.ReadAllLines(filePath);
+            string line = lines[0];
+
+            // Initialises the _data
+            int numRows = lines.Length;
+            int numCols = line.Split(delimiter).Length;
+            _data = new double[numRows,numCols];
+
+            // Fills the data array
+            string[] cols;
+            try
+            {
+                for (int row = 0; row < numRows; row++)
+                {
+                    line = lines[row];
+                    cols = line.Split(delimiter);
+                    for (int col = 0; col < numCols; col++)
+                    {
+                        _data[row,col] = double.Parse(cols[col]);
+                    }
+                }
+            }
+            catch(IndexOutOfRangeException)
+            {
+                throw new ArgumentException("The text file's row or column is inconsistent!");
+            }
+        }
+
     }
 
     /// <summary>
@@ -1434,7 +1472,7 @@ class Matrix
 
     #endregion
 
-    #region External Helper Methods
+    #region Helper Methods
 
     // ===========For Load and Save matrix===========
     private static byte[] DoubleArrToBytes(double[,] arr)
@@ -1499,6 +1537,23 @@ class Matrix
 
     // ===========For Load and Save matrix===========
 
+    /// <summary>
+    /// Checks whether the file matches the extension or not
+    /// </summary>
+    /// <param name="filePath">the file path</param>
+    /// <param name="extension">file extension</param>
+    /// <returns>true if matches</returns>
+    public static bool CheckFileExtension(string filePath, string extension)
+    {
+        if(filePath.Substring(filePath.Length-$".{extension}".Length,$".{extension}".Length)==$".{extension}")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     #endregion
 }
 
