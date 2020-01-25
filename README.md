@@ -25,4 +25,5 @@ Matrix class
 2020/1/22
 1. matrix file constructor, be able to handle two types of files
   txt, data ---done!
+2. Implement Matrixsave text file version
 

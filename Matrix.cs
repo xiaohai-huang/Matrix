@@ -167,10 +167,10 @@ class Matrix
     /// <param name="filePath">the file containing a matrix</param>
     public Matrix(string filePath)
     {
-        bool isDataFile = CheckFileExtension(filePath,"data");
-        bool isTextFile = CheckFileExtension(filePath,"txt");
+        bool isDataFile = CheckFileExtension(filePath, "data");
+        bool isTextFile = CheckFileExtension(filePath, "txt");
         // if input is a data file
-        if(isDataFile)
+        if (isDataFile)
         {
             // This uses the ArrayLoader class from ITD121 PST1
             _data = Load2DArray(filePath);
@@ -185,7 +185,7 @@ class Matrix
             // Initialises the _data
             int numRows = lines.Length;
             int numCols = line.Split(delimiter).Length;
-            _data = new double[numRows,numCols];
+            _data = new double[numRows, numCols];
 
             // Fills the data array
             string[] cols;
@@ -197,11 +197,11 @@ class Matrix
                     cols = line.Split(delimiter);
                     for (int col = 0; col < numCols; col++)
                     {
-                        _data[row,col] = double.Parse(cols[col]);
+                        _data[row, col] = double.Parse(cols[col]);
                     }
                 }
             }
-            catch(IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 throw new ArgumentException("The text file's row or column is inconsistent!");
             }
@@ -807,19 +807,19 @@ class Matrix
             {
                 column = matrix.GetColumn(col);
                 double rowSum = Matrix.Sum(column)[0];
-                result[0,col] = rowSum;
+                result[0, col] = rowSum;
             }
             return result;
         }
         else if (axis == 1) // sums across the columns
         {
-            result = new Matrix(matrix.Row,1);
+            result = new Matrix(matrix.Row, 1);
             Matrix row;
-            for(int rowIndex =0;rowIndex<matrix.Row;rowIndex++)
+            for (int rowIndex = 0; rowIndex < matrix.Row; rowIndex++)
             {
                 row = matrix.GetRow(rowIndex);
                 double colSum = Matrix.Sum(row)[0];
-                result[rowIndex,0] = colSum;
+                result[rowIndex, 0] = colSum;
             }
             return result;
         }
@@ -1383,12 +1383,22 @@ class Matrix
 
 
     /// <summary>
-    /// Saves the matrix as a data file
+    /// Saves the matrix in a file
     /// </summary>
-    /// <param name="filePath"></param>
+    /// <param name="filePath">the file path</param>
     public void SaveMatrix(string filePath)
     {
-        Save2DArray(this._data, filePath);
+        bool isDataFile = CheckFileExtension(filePath,"data");
+        bool isTextFile = CheckFileExtension(filePath,"txt");
+        
+        if (isDataFile)
+        {
+            Save2DArray(this._data, filePath);
+        }
+        else if (isTextFile)
+        {
+            SaveMatrixText(this,filePath);
+        }
     }
 
 
@@ -1545,7 +1555,7 @@ class Matrix
     /// <returns>true if matches</returns>
     public static bool CheckFileExtension(string filePath, string extension)
     {
-        if(filePath.Substring(filePath.Length-$".{extension}".Length,$".{extension}".Length)==$".{extension}")
+        if (filePath.Substring(filePath.Length - $".{extension}".Length, $".{extension}".Length) == $".{extension}")
         {
             return true;
         }
@@ -1553,6 +1563,32 @@ class Matrix
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// Saves the matrix as a text file
+    /// </summary>
+    /// <param name="matrix">the matrix to be saved</param>
+    /// <param name="filePath">the file path to save the matrix</param>
+    private static void SaveMatrixText(Matrix matrix, string filePath)
+    {
+        char delimiter = ',';
+        string[] content = new string[matrix.Row];
+
+        // Fills the content array
+        for (int row = 0; row < matrix.Row; row++)
+        {
+            // Generates each row
+            string rowData = "";
+            for (int col = 0; col < matrix.Column; col++)
+            {
+                rowData += $"{matrix[row, col]}{delimiter}";
+            }
+            // Removes the delimiter at the end of each row
+            content[row] = rowData.Substring(0,rowData.Length-1);
+        }
+
+        System.IO.File.WriteAllLines(filePath, content);
     }
     #endregion
 }
