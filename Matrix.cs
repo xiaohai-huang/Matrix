@@ -769,6 +769,17 @@ class Matrix
     #region Math Functions
 
     /// <summary>
+    /// Sigmoid function, take Z, return number between 0 - 1
+    /// </summary>
+    /// <param name="Z">W.T * X + b</param>
+    /// <returns>A, size is the same as input</returns>
+    public static Matrix Sigmoid(Matrix Z)
+    {
+        Matrix A = new Matrix(Z.Shape);
+        A = 1 / (1 + Matrix.Exp(-1 * Z));
+        return A;
+    }
+    /// <summary>
     /// Returns the sum of the whole matrix as a 1 x 1 matrix
     /// </summary>
     /// <returns>1 X 1 Matrix</returns>
@@ -1388,16 +1399,16 @@ class Matrix
     /// <param name="filePath">the file path</param>
     public void SaveMatrix(string filePath)
     {
-        bool isDataFile = CheckFileExtension(filePath,"data");
-        bool isTextFile = CheckFileExtension(filePath,"txt");
-        
+        bool isDataFile = CheckFileExtension(filePath, "data");
+        bool isTextFile = CheckFileExtension(filePath, "txt");
+
         if (isDataFile)
         {
             Save2DArray(this._data, filePath);
         }
         else if (isTextFile)
         {
-            SaveMatrixText(this,filePath);
+            SaveMatrixText(this, filePath);
         }
     }
 
@@ -1585,7 +1596,7 @@ class Matrix
                 rowData += $"{matrix[row, col]}{delimiter}";
             }
             // Removes the delimiter at the end of each row
-            content[row] = rowData.Substring(0,rowData.Length-1);
+            content[row] = rowData.Substring(0, rowData.Length - 1);
         }
 
         System.IO.File.WriteAllLines(filePath, content);
