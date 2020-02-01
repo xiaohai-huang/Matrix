@@ -64,7 +64,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Return the size of the matrix as a string. e.g. "5 X 3"
+    /// Return the size of the matrix as a string (a space between operator and operand). e.g. "5 X 3"
     /// </summary>
     /// <value></value>
     public string Size
@@ -256,28 +256,186 @@ class Matrix
 
     #region Operator Helpers
 
+
     /// <summary>
-    /// matrix dot product
+    /// Matrix dot product
     /// </summary>
-    /// <param name="rightMatrix"></param>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
     /// <returns></returns>
-    public Matrix Dot(Matrix rightMatrix)
+    public static Matrix Dot(Matrix left, Matrix right)
+    {
+        Matrix result = left.Dot(right);
+        return result;
+    }
+    /// <summary>
+    /// Element-wise addition, broadcasting
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static Matrix Add(Matrix left, Matrix right)
+    {
+        Matrix[] ab = BroadCasting(left, right);
+        Matrix a = ab[0];
+        Matrix b = ab[1];
+        Matrix result = new Matrix(a.Row, a.Column);
+
+        // check the size
+        if (a.Size != b.Size)
+        {
+            Console.WriteLine("Cannot add these two matries");
+            throw new ArgumentException($"The size of left matrix: {a.Size} is not equal to the right matrix: {b.Size}");
+        }
+        for (int row = 0; row < result.Row; row++)
+        {
+            for (int col = 0; col < result.Column; col++)
+            {
+                result[row, col] = a[row, col] + b[row, col];
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Element-wise substraction, broadcasting
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static Matrix Substract(Matrix left, Matrix right)
+    {
+        Matrix[] ab = BroadCasting(left, right);
+        Matrix a = ab[0];
+        Matrix b = ab[1];
+        Matrix result = new Matrix(a.Row, a.Column);
+
+        // check the size
+        if (a.Size != b.Size)
+        {
+            Console.WriteLine("Cannot substract these two matries");
+            throw new ArgumentException($"The size of left matrix: {a.Size} is not equal to the right matrix: {b.Size}");
+        }
+        for (int row = 0; row < result.Row; row++)
+        {
+            for (int col = 0; col < result.Column; col++)
+            {
+                result[row, col] = a[row, col] - b[row, col];
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Element-wise multiplication, broadcasting
+    /// </summary>
+    /// <param name="left">left matrix</param>
+    /// <param name="right">right matrix</param>
+    /// <returns>a matrix</returns>
+    public static Matrix Multiply(Matrix left, Matrix right)
+    {
+        Matrix[] ab = BroadCasting(left, right);
+        Matrix a = ab[0];
+        Matrix b = ab[1];
+
+        Matrix result = new Matrix(a.Shape);
+        for (int row = 0; row < a.Row; row++)
+        {
+            for (int col = 0; col < a.Column; col++)
+            {
+                result[row, col] = a[row, col] * b[row, col];
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Element-wise division, broadcasting
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static Matrix Divide(Matrix left, Matrix right)
+    {
+        Matrix[] ab = BroadCasting(left, right);
+        Matrix a = ab[0];
+        Matrix b = ab[1];
+
+        Matrix result = new Matrix(a.Shape);
+        for (int row = 0; row < a.Row; row++)
+        {
+            for (int col = 0; col < a.Column; col++)
+            {
+                result[row, col] = a[row, col] / b[row, col];
+            }
+        }
+        return result;
+    }
+
+
+    /// <summary>
+    /// element-wise addition
+    /// </summary>
+    /// <param name="right"></param>
+    /// <returns>new matrix</returns>
+    public Matrix Add(Matrix right)
+    {
+        Matrix result = Add(this, right);
+        return result;
+    }
+
+    /// <summary>
+    /// element-wise substraction
+    /// </summary>
+    /// <param name="right"></param>
+    /// <returns>new matrix</returns>
+    public Matrix Substract(Matrix right)
+    {
+        Matrix result = Substract(this, right);
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// element-wise multiplication, broadcasting
+    /// </summary>
+    /// <param name="num">the number to be multiplied</param>
+    /// <returns>new matrix</returns>
+    public Matrix Multiply(double num)
+    {
+        // Truns the number into a 1 X 1 matrix 
+        Matrix numMatrix = new Matrix(1, 1).SetNum(num);
+
+        Matrix result = Multiply(this, numMatrix);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Matrix dot product
+    /// </summary>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public Matrix Dot(Matrix right)
     {
         Matrix output;
 
         // check whether row == col
-        if (this.Column == rightMatrix.Row)//valid
+        if (this.Column == right.Row)//valid
         {
-            output = new Matrix(row: this.Row, col: rightMatrix.Column);// output matrix initialize
+            output = new Matrix(row: this.Row, col: right.Column);// output matrix initialize
 
             for (int row = 0; row < this.Row; row++)
             {
-                for (int col = 0; col < rightMatrix.Column; col++)
+                for (int col = 0; col < right.Column; col++)
                 {
                     double cell = 0;
                     for (int leftColumnIndex = 0; leftColumnIndex < this.Column; leftColumnIndex++)
                     {
-                        cell = cell + this[row, leftColumnIndex] * rightMatrix[leftColumnIndex, col];
+                        cell = cell + this[row, leftColumnIndex] * right[leftColumnIndex, col];
                     }
                     output[row, col] = cell;
                 }
@@ -287,122 +445,12 @@ class Matrix
         else// if input is invalid
         {
             Console.WriteLine("left [column] and right [row] is not the same");
-            Console.WriteLine($"{this.Column} != {rightMatrix.Row}");
+            Console.WriteLine($"{this.Column} != {right.Row}");
             throw new ArgumentException();
         }
     }
 
-    /// <summary>
-    /// element-wise addition
-    /// </summary>
-    /// <param name="rightMatrix"></param>
-    /// <returns>new matrix</returns>
-    public Matrix Add(Matrix rightMatrix)
-    {
-        Matrix result;
-        // check the size
-        if (this.Size != rightMatrix.Size)
-        {
-            Console.WriteLine("Cannot add these two matries together");
-            throw new ArgumentException($"Orginal: The size of left matrix: {this.Size} is not equal to the right matrix: {rightMatrix.Size}");
-        }
-        else
-        {
-            result = new Matrix(this.Row, this.Column);
 
-            for (int row = 0; row < result.Row; row++)
-            {
-                for (int col = 0; col < result.Column; col++)
-                {
-                    result[row, col] = this[row, col] + rightMatrix[row, col];
-                }
-            }
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// element-wise substraction
-    /// </summary>
-    /// <param name="rightMatrix"></param>
-    /// <returns>new matrix</returns>
-    public Matrix Substract(Matrix rightMatrix)
-    {
-        Matrix result;
-
-        // check the size
-        if (this.Size != rightMatrix.Size)
-        {
-            Console.WriteLine("Cannot substract these two matries");
-            throw new ArgumentException($"Orginal: The size of left matrix: {this.Size} is not equal to the right matrix: {rightMatrix.Size}");
-        }
-
-        result = new Matrix(this.Row, this.Column);
-
-        for (int row = 0; row < result.Row; row++)
-        {
-            for (int col = 0; col < result.Column; col++)
-            {
-                result[row, col] = this[row, col] - rightMatrix[row, col];
-            }
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    /// element-wise multiplication, broadcasting
-    /// </summary>
-    /// <param name="num">the number to be multiplied</param>
-    /// <returns>new matrix</returns>
-    public Matrix Multiply(double num)
-    {
-        Matrix result = new Matrix(this.Shape);
-
-        for (int row = 0; row < this.Row; row++)
-        {
-            for (int col = 0; col < this.Column; col++)
-            {
-                result[row, col] = this[row, col] * num;
-            }
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// element-wise multiplication
-    /// </summary>
-    /// <param name="right"></param>
-    /// <returns>Shape will remain unchanged</returns>
-    public Matrix Multiply(Matrix right)
-    {
-
-        if (this.Size != right.Size)
-        {
-            throw new ArgumentException("Perform element wise multiplication between two matries,"
-            + " their size has to be the same");
-        }
-        Matrix result = new Matrix(right.Shape);
-        for (int row = 0; row < right.Row; row++)
-        {
-            for (int col = 0; col < right.Column; col++)
-            {
-                result[row, col] = this[row, col] * right[row, col];
-            }
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// Element-wise multiplication of two matries
-    /// </summary>
-    /// <param name="left">left matrix</param>
-    /// <param name="right">right matrix</param>
-    /// <returns>a matrix</returns>
-    public static Matrix Multiply(Matrix left, Matrix right)
-    {
-        return left.Multiply(right);
-    }
     // for overloadding == and !=
     public bool Equals(Matrix other)
     {
@@ -431,105 +479,132 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator *(Matrix left, Matrix right)
     {
-        return left.Dot(right);
+        return Dot(left,right);
     }
 
     /// <summary>
-    /// element-wise addition, broadcasting
+    /// Broadcasting the two input matries
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns>a matrix 1D array after broadcasting</returns>
+    private static Matrix[] BroadCasting(Matrix a, Matrix b)
+    {
+        if (a.Size == b.Size) // No need to perform broadcasting
+        {
+            return new Matrix[] { a, b };
+        }
+
+        Matrix left = null;
+        Matrix right = null;
+        // case 1: (numRows,numCols) (1,1)
+        // if one of them is a 1 X 1 matrix
+        if (a.Size == "1 X 1")
+        {
+            left = new Matrix(b.Shape).SetNum(a[0]);
+            right = new Matrix(b);
+        }
+        else if (b.Size == "1 X 1")
+        {
+            left = new Matrix(a);
+            right = new Matrix(a.Shape).SetNum(b[0]);
+        }
+        // case 2: 400 X 100 and 4 X 1
+        // for two matries which have the same row and one of them has 1 column
+        else if (a.Row == b.Row)
+        {
+            if (a.Column == 1) // Expands a = 4 X 1
+            {
+                Matrix rowAccumulator = new Matrix(1, b.Shape[1]);
+                // One single row
+                Matrix row;
+                for (int i = 0; i < a.Row; i++)
+                {
+                    row = new Matrix(1, b.Shape[1]).SetNum(a[i]);
+                    rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                }
+                // Remove the first row
+                rowAccumulator = rowAccumulator.RemoveRow(0);
+
+                left = rowAccumulator;
+                right = new Matrix(b);
+            }
+            else // Expands b = 4 X 1
+            {
+                Matrix rowAccumulator = new Matrix(1, a.Shape[1]);
+                // One single row
+                Matrix row;
+                for (int i = 0; i < b.Row; i++)
+                {
+                    row = new Matrix(1, a.Shape[1]).SetNum(b[i]);
+                    rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                }
+                // Remove the first row
+                rowAccumulator = rowAccumulator.RemoveRow(0);
+
+                left = new Matrix(a);
+                right = rowAccumulator;
+            }
+        }
+        // case 3: 1 X 3 and 4 X 3
+        // for tow matries which have the same col and one of them has 1 row
+        else if (a.Column == b.Column)
+        {
+            Matrix rowAccumulator = new Matrix(1, a.Column);
+            if (a.Row == 1) // Expands left matrix by copying row down
+            {
+                Matrix row = new Matrix(a);
+                for (int i = 0; i < b.Row; i++)
+                {
+                    rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                }
+                rowAccumulator = rowAccumulator.RemoveRow(0);
+
+                left = rowAccumulator;
+                right = new Matrix(b);
+            }
+            else // Expands the right matrix
+            {
+                Matrix row = new Matrix(b);
+                for (int i = 0; i < a.Row; i++)
+                {
+                    rowAccumulator = rowAccumulator.BottomConcatenate(row);
+                }
+                rowAccumulator = rowAccumulator.RemoveRow(0);
+
+                left = new Matrix(a);
+                right = rowAccumulator;
+            }
+        }
+        else // Throws an exception
+        {
+            throw new ArgumentException($"These two matries cannot be broadcated! a = {a.Size}, b = {b.Size}");
+        }
+
+        return new Matrix[] { left, right };
+    }
+
+    /// <summary>
+    /// Element-wise addition, broadcasting
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
     public static Matrix operator +(Matrix left, Matrix right)
     {
-        // check size to perform broadcasting
-        if (left.Size != right.Size)
-        {
-            // for 1 x 1 matrix, expand the matrix
-            if (right.Size == "1 X 1")
-            {
-                right = new Matrix(left.Shape).SetNum(right[0]);
-            }
-            else if (left.Size == "1 X 1")
-            {
-                left = new Matrix(right.Shape).SetNum(left[0]);
-            }
-            // for two matries which have the same row and one of them has 1 column
-            // e.g. 4 X 100 and 4 X 1
-            else if (left.Shape[0] == right.Shape[0])// if row == row
-            {
-                if (left.Shape[1] == 1)// if the left matrix's column number is 1, Expands the left matrix
-                {
-                    Matrix rowAccumulator = new Matrix(1, right.Shape[1]);
-                    // One single row
-                    Matrix row;
-                    for (int i = 0; i < left.Row; i++)
-                    {
-                        row = new Matrix(1, right.Shape[1]).SetNum(left[i]);
-                        rowAccumulator = rowAccumulator.BottomConcatenate(row);
-                    }
-                    // Remove the first row
-                    rowAccumulator = rowAccumulator.RemoveRow(0);
-                    left = rowAccumulator;
-                }
-                else // Expands the right matrix
-                {
-                    //if (right.Shape[1] == 1)
-                    // if the right matrix's column number is 1, Expands the right matrix
+        Matrix[] ab = BroadCasting(left, right);
 
-                    Matrix rowAccumulator = new Matrix(1, left.Shape[1]);
-                    // One single row
-                    Matrix row;
-                    for (int i = 0; i < right.Row; i++)
-                    {
-                        row = new Matrix(1, left.Shape[1]).SetNum(right[i]);
-                        rowAccumulator = rowAccumulator.BottomConcatenate(row);
-                    }
-                    // Remove the first row
-                    rowAccumulator = rowAccumulator.RemoveRow(0);
-                    right = rowAccumulator;
+        Matrix a = ab[0];
+        Matrix b = ab[1];
 
-                }
-            }
-            // e.g. 1 X 3 and 4 X 3
-            else if (left.Shape[1] == right.Shape[1])
-            {
-                Matrix rowAccumulator = new Matrix(1, left.Column);
-                if (left.Shape[0] == 1) // Expands left matrix by copying row down
-                {
-                    Matrix row = new Matrix(left.ToDoubleArray());
-                    for (int i = 0; i < right.Row; i++)
-                    {
-                        rowAccumulator = rowAccumulator.BottomConcatenate(row);
-                    }
-                    rowAccumulator = rowAccumulator.RemoveRow(0);
-                    left = rowAccumulator;
-                }
-                else // Expands the right matrix
-                {
-                    if (right.Shape[0] == 1) // Expands left matrix by copying row down
-                    {
-                        Matrix row = new Matrix(right.ToDoubleArray());
-                        for (int i = 0; i < left.Row; i++)
-                        {
-                            rowAccumulator = rowAccumulator.BottomConcatenate(row);
-                        }
-                        rowAccumulator = rowAccumulator.RemoveRow(0);
-                        right = rowAccumulator;
-                    }
-                }
-            }
-        }
         Matrix result;
-        result = left.Add(right);
+        result = a.Add(b);
 
         return result;
     }
 
-
-
     /// <summary>
-    /// element-wise addition, make a matrix full of the number then add the new matrix with the corresopnding matrix
+    /// Element-wise addition, make a matrix full of the number then add the new matrix with the corresopnding matrix
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -542,7 +617,7 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise addition, make a matrix full of the number then add the new matrix with the corresopnding matrix
+    /// Element-wise addition, make a matrix full of the number then add the new matrix with the corresopnding matrix
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -556,7 +631,7 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise substraction, make a matrix full of the number then substract the new matrix with the corresopnding matrix
+    /// Element-wise substraction
     /// </summary>
     /// <param name="left">left matrix</param>
     /// <param name="right">right number</param>
@@ -569,7 +644,7 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise substraction, make a matrix full of the number then substract the new matrix with the corresopnding matrix
+    /// Element-wise substraction
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -583,49 +658,46 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise substraction
+    /// Element-wise substraction
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
     public static Matrix operator -(Matrix left, Matrix right)
     {
-        Matrix result;
-        // boradcasting for 1 x 1 matrix
-        // e.g. 5 x 5 matrix - 1 x 1 matrix
-        // trun the 1 x 1 to 5 x 5 first
-        if (right.Size == "1 X 1")
-        {
-            right = new Matrix(left.Shape).SetNum(right[0]);
-        }
-        result = left.Substract(right);
+        
+        Matrix result = Substract(left,right);
 
         return result;
     }
 
     /// <summary>
-    /// element-wise multiplication
+    /// Element-wise multiplication
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
     public static Matrix operator *(Matrix left, double right)
     {
-        Matrix result;
-        result = left.Multiply(right);
+        // Truns the number into a 1 X 1 matrix
+        Matrix rightMatrix = new Matrix(1, 1).SetNum(right);
+        Matrix result = Multiply(left, rightMatrix);
+
         return result;
     }
 
     /// <summary>
-    /// element-wise multiplication
+    /// Element-wise multiplication
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
     public static Matrix operator *(double left, Matrix right)
     {
-        Matrix result;
-        result = right.Multiply(left);
+        // Turns the number into a 1 X 1 matrix
+        Matrix leftMatrix = new Matrix(1, 1).SetNum(left);
+        Matrix result = Multiply(leftMatrix, right);
+
         return result;
     }
 
@@ -637,37 +709,23 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator /(Matrix left, double right)
     {
-        Matrix result = new Matrix(left.Shape);
         Matrix rightMatrix = new Matrix(left.Shape).SetNum(right);
+        Matrix result = Divide(left, rightMatrix);
 
-        for (int row = 0; row < left.Row; row++)
-        {
-            for (int col = 0; col < left.Column; col++)
-            {
-                result[row, col] = left[row, col] / rightMatrix[row, col];
-            }
-        }
         return result;
     }
 
     /// <summary>
-    /// element wise division
+    /// Element wise division
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
     public static Matrix operator /(double left, Matrix right)
     {
-        Matrix result = new Matrix(right.Shape);
         Matrix leftMatrix = new Matrix(right.Shape).SetNum(left);
+        Matrix result = Divide(leftMatrix, right);
 
-        for (int row = 0; row < right.Row; row++)
-        {
-            for (int col = 0; col < right.Column; col++)
-            {
-                result[row, col] = leftMatrix[row, col] / right[row, col];
-            }
-        }
         return result;
     }
 
@@ -679,14 +737,7 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator /(Matrix left, Matrix right)
     {
-        Matrix result = new Matrix(right.Shape);
-        for (int row = 0; row < right.Row; row++)
-        {
-            for (int col = 0; col < right.Column; col++)
-            {
-                result[row, col] = left[row, col] / right[row, col];
-            }
-        }
+        Matrix result = Divide(left, right);
         return result;
     }
 
@@ -704,7 +755,6 @@ class Matrix
                 hashCode += numCells * (row * col) * this[row, col];
             }
         }
-
 
         return (int)hashCode;
     }
@@ -1491,6 +1541,17 @@ class Matrix
         return result;
     }
 
+    /// <summary>
+    /// Concatenates two matries from left to right
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns>leftright</returns>
+    public static Matrix Concatenate(Matrix left, Matrix right)
+    {
+        return left.Concatenate(right);
+    }
+    
     #endregion
 
     #region Helper Methods
