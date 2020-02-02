@@ -27,3 +27,6 @@ Matrix class
   txt, data ---done!
 2. Implement Matrixsave text file version ---done!
 
+2020/2/02
+1. Improve Matrix reshape which takes 1D int array as a parameter. ---done!
+

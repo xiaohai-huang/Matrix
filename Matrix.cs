@@ -268,6 +268,7 @@ class Matrix
         Matrix result = left.Dot(right);
         return result;
     }
+
     /// <summary>
     /// Element-wise addition, broadcasting
     /// </summary>
@@ -1089,7 +1090,7 @@ class Matrix
     }
 
     /// <summary>
-    /// reshape the matrix,supply row and column
+    /// Reshapes the matrix using row and column
     /// </summary>
     /// <param name="row">the number of rows</param>
     /// <param name="col">the number of columns</param>
@@ -1127,6 +1128,18 @@ class Matrix
         return shappedMatrix;
     }
 
+    /// <summary>
+    /// Reshapes the matrix using a 1D int array
+    /// </summary>
+    /// <param name="shape">1D array containing row and col</param>
+    /// <returns></returns>
+    public Matrix Reshape(int[] shape)
+    {
+        int row = shape[0];
+        int col = shape[1];
+        return this.Reshape(row,col);
+    }
+    
     /// <summary>
     /// Reshapes the matrix using column number only
     /// </summary>
