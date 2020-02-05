@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 
@@ -263,11 +264,46 @@ class Matrix
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static Matrix Dot(Matrix left, Matrix right)
+    public static Matrix Dot_Sequential(Matrix left, Matrix right)
     {
         Matrix result = left.Dot(right);
         return result;
     }
+
+    /// <summary>
+    /// Matrix dot product, parallel
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static Matrix Dot(Matrix left, Matrix right)
+    {
+        {
+            int matACols = left.Column;
+            int matBCols = right.Column;
+            int matARows = left.Row;
+
+            Matrix result = new Matrix(matARows,matBCols);
+
+            // A basic matrix multiplication.
+            // Parallelize the outer loop to partition the source array by rows.
+            Parallel.For(0, matARows, i =>
+            {
+                for (int j = 0; j < matBCols; j++)
+                {
+                    double temp = 0;
+                    for (int k = 0; k < matACols; k++)
+                    {
+                        temp += left[i, k] * right[k, j];
+                    }
+                    result[i, j] = temp;
+                }
+            }); // Parallel.For
+
+            return result;
+        }
+    }
+
 
     /// <summary>
     /// Element-wise addition, broadcasting
@@ -480,7 +516,7 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator *(Matrix left, Matrix right)
     {
-        return Dot(left,right);
+        return Dot(left, right);
     }
 
     /// <summary>
@@ -666,8 +702,8 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator -(Matrix left, Matrix right)
     {
-        
-        Matrix result = Substract(left,right);
+
+        Matrix result = Substract(left, right);
 
         return result;
     }
@@ -1137,9 +1173,9 @@ class Matrix
     {
         int row = shape[0];
         int col = shape[1];
-        return this.Reshape(row,col);
+        return this.Reshape(row, col);
     }
-    
+
     /// <summary>
     /// Reshapes the matrix using column number only
     /// </summary>
@@ -1564,7 +1600,7 @@ class Matrix
     {
         return left.Concatenate(right);
     }
-    
+
     #endregion
 
     #region Helper Methods

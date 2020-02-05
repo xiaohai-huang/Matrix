@@ -3,8 +3,8 @@ Matrix class
 
 
 2019/12/19
-1. Matrix convolution (x)
-2. GetByteArray (x)
+1. Matrix convolution ---done!
+2. GetByteArray ---done!
 
 2020/1/9
 1. Implement ==,!=, GetHashCode, Equals---done!
@@ -14,7 +14,7 @@ Matrix class
 2020/1/18
 1. Implement static element-wise multiplication ---done!
 2. Modify double[] constructor ---done!
-3. Improve + for broadcasting ---done!s
+3. Improve + for broadcasting ---done!
 4. Rename Getdata => ToDoubleArray ---done!
 5. RandomMatrix change method variable name ---done!
 6. Create a helper method for broadcasting!!!
@@ -29,4 +29,7 @@ Matrix class
 
 2020/2/02
 1. Improve Matrix reshape which takes 1D int array as a parameter. ---done!
+
+2020/2/5
+1. Matrix dot product parallel version. ---done!
 
