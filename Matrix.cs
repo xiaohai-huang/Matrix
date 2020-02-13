@@ -163,23 +163,23 @@ class Matrix
     }
 
     /// <summary>
-    /// Constructs a matrix using a data file or text file
+    /// Constructs a matrix using a data file or csv file
     /// </summary>
     /// <param name="filePath">the file containing a matrix</param>
     public Matrix(string filePath)
     {
         bool isDataFile = CheckFileExtension(filePath, "data");
-        bool isTextFile = CheckFileExtension(filePath, "txt");
+        bool isCSVFile = CheckFileExtension(filePath, "csv");
         // if input is a data file
         if (isDataFile)
         {
             // This uses the ArrayLoader class from ITD121 PST1
             _data = Load2DArray(filePath);
         }
-        else if (isTextFile)// The delimiter is ,
+        else if (isCSVFile)// The delimiter is ,
         {
             char delimiter = ',';
-            // Loads data from the text file
+            // Loads data from the csv file
             string[] lines = File.ReadAllLines(filePath);
             string line = lines[0];
 
@@ -204,7 +204,7 @@ class Matrix
             }
             catch (IndexOutOfRangeException)
             {
-                throw new ArgumentException("The text file's row or column is inconsistent!");
+                throw new ArgumentException("The csv file's row or column is inconsistent!");
             }
         }
 
@@ -279,11 +279,18 @@ class Matrix
     public static Matrix Dot(Matrix left, Matrix right)
     {
         {
-            int matACols = left.Column;
-            int matBCols = right.Column;
             int matARows = left.Row;
+            int matACols = left.Column;
+            int matBRows = right.Row;
+            int matBCols = right.Column;
 
-            Matrix result = new Matrix(matARows,matBCols);
+            // Checks dimensions
+            if(matACols!=matBRows)
+            {
+                throw new ArgumentException("Cannot perform matrix dot product on these two matries!");
+            }
+
+            Matrix result = new Matrix(matARows, matBCols);
 
             // A basic matrix multiplication.
             // Parallelize the outer loop to partition the source array by rows.
@@ -858,14 +865,87 @@ class Matrix
     /// <summary>
     /// Sigmoid function, take Z, return number between 0 - 1
     /// </summary>
-    /// <param name="Z">W.T * X + b</param>
-    /// <returns>A, size is the same as input</returns>
+    /// <param name="Z">W.T * A + b</param>
+    /// <returns>Activation, numbers are between 0 ~ 1 </returns>
     public static Matrix Sigmoid(Matrix Z)
     {
         Matrix A = new Matrix(Z.Shape);
         A = 1 / (1 + Matrix.Exp(-1 * Z));
         return A;
     }
+
+    /// <summary>
+    /// Computes the derivative of sigmoid function at Z
+    /// </summary>
+    /// <param name="A">activation, the output of the sigmoid function</param>
+    /// <returns>The derivative</returns>
+    public static Matrix Sigmoid_Derivative(Matrix A)
+    {
+        Matrix derivative = Multiply(A, (1 - A) );
+        return derivative;
+    }
+
+    /// <summary>
+    /// Hyperbolic tangent function, take Z, return number between -1 ~ 1, (e^z - e^-z)/(e^z + e^-z)
+    /// </summary>
+    /// <param name="Z">W.T * A + b</param>
+    /// <returns>Activation, numbers are between -1 ~ 1</returns>
+    public static Matrix Tanh(Matrix Z)
+    {
+        Matrix result = new Matrix(Z.Shape);
+        result = (Matrix.Exp(Z) - Matrix.Exp(-1 * Z)) / (Matrix.Exp(Z) + Matrix.Exp(-1 * Z));
+        return result;
+    }
+
+    /// <summary>
+    /// Computes the derivative of tanh function at Z
+    /// </summary>
+    /// <param name="A">activation, the output of the tanh function</param>
+    /// <returns>The derivative</returns>
+    public static Matrix Tanh_Derivative(Matrix A)
+    {
+        // derivative =  1 - A^2
+        Matrix derivative = 1 - Power(A, 2);
+        return derivative;
+    }
+
+    /// <summary>
+    /// Rectified Linear Unit function, max(0,Z)
+    /// </summary>
+    /// <param name="Z">W.T * A + b</param>
+    /// <returns></returns>
+    public static Matrix ReLU(Matrix Z)
+    {
+        Matrix result = Max(0, Z);
+        return result;
+    }
+
+    /// <summary>
+    /// Computes the derivative of ReLU function at Z
+    /// </summary>
+    /// <param name="Z">Z</param>
+    /// <returns>The derivative</returns>
+    public static Matrix ReLU_Derivative(Matrix Z)
+    {
+        Matrix derivative = new Matrix(Z);
+
+        for (int row = 0; row < Z.Row; row++)
+        {
+            for (int col = 0; col < Z.Column; col++)
+            {
+                if (Z[row, col] < 0)
+                {
+                    derivative[row,col] = 0;
+                }
+                else // Z >= 0
+                {
+                    derivative[row,col] = 1;
+                }
+            }
+        }
+        return derivative;
+    }
+    
     /// <summary>
     /// Returns the sum of the whole matrix as a 1 x 1 matrix
     /// </summary>
@@ -946,7 +1026,7 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise power
+    /// Element-wise power
     /// </summary>
     /// <param name="matrix"></param>
     /// <param name="num">the specific num to be raised to</param>
@@ -988,7 +1068,7 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise Exp, e^matrix
+    /// Element-wise Exp, e^matrix
     /// </summary>
     /// <param name="matrix"></param>
     /// <returns>a matrix after calculation</returns>
@@ -1000,14 +1080,22 @@ class Matrix
         {
             for (int col = 0; col < matrix.Column; col++)
             {
-                newMatrix[row, col] = Math.Exp(matrix[row, col]);//e^num
+                // Handles positive infinity
+                if (double.IsPositiveInfinity(Math.Exp(matrix[row, col])))
+                {
+                    newMatrix[row, col] = double.MaxValue;//e^num    
+                }
+                else
+                {
+                    newMatrix[row, col] = Math.Exp(matrix[row, col]);//e^num
+                }
             }
         }
         return newMatrix;
     }
 
     /// <summary>
-    /// element-wise natural log (base e)
+    /// Element-wise natural log (base e)
     /// </summary>
     /// <param name="matrix"></param>
     /// <returns></returns>
@@ -1027,15 +1115,35 @@ class Matrix
     }
 
     /// <summary>
-    /// element-wise tanh, (e^z - e^-z)/(e^z + e^-z)
+    /// Element-wise max(left,right)
     /// </summary>
-    /// <param name="Z"></param>
-    /// <returns>a matrix which has the same dimension as input</returns>
-    public static Matrix tanh(Matrix Z)
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns>a matrix</returns>
+    public static Matrix Max(double left, Matrix right)
     {
-        Matrix result = new Matrix(Z.Shape);
-        result = (Matrix.Exp(Z) - Matrix.Exp(-1 * Z)) / (Matrix.Exp(Z) + Matrix.Exp(-1 * Z));
+        Matrix result = new Matrix(right.Shape);
+
+        for (int row = 0; row < right.Row; row++)
+        {
+            for (int col = 0; col < right.Column; col++)
+            {
+                result[row, col] = Math.Max(left, right[row, col]);
+            }
+        }
+
         return result;
+    }
+
+    /// <summary>
+    /// Element-wise max(left,right)
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns>a matrix</returns>
+    public static Matrix Max(Matrix left, double right)
+    {
+        return Max(right, left);
     }
 
     /// <summary>
@@ -1222,32 +1330,6 @@ class Matrix
             Console.WriteLine();
         }
         Console.WriteLine($"\nThis is a {this.Row} x {this.Column} Matrix");
-    }
-
-    /// <summary>
-    /// Converts the whole matrix into a string, that can be directly save as a text file
-    /// </summary>
-    /// <returns>a string containing the whole matrix</returns>
-    public string ReturnString()
-    {
-        string text = "";
-        for (int row = 0; row < this.Row; row++)
-        {
-            text = text + "{";
-            for (int col = 0; col < this.Column; col++)
-            {
-                if (col == this.Column - 1)
-                {
-                    text = text + (this[row, col]);
-                }
-                else
-                {
-                    text = text + (this[row, col] + ",");
-                }
-            }
-            text = text + "},\n";
-        }
-        return text;
     }
 
     /// <summary>
@@ -1499,15 +1581,15 @@ class Matrix
     public void SaveMatrix(string filePath)
     {
         bool isDataFile = CheckFileExtension(filePath, "data");
-        bool isTextFile = CheckFileExtension(filePath, "txt");
+        bool isCSVFile = CheckFileExtension(filePath, "csv");
 
         if (isDataFile)
         {
             Save2DArray(this._data, filePath);
         }
-        else if (isTextFile)
+        else if (isCSVFile)
         {
-            SaveMatrixText(this, filePath);
+            SaveMatrixCSV(this, filePath);
         }
     }
 
@@ -1687,11 +1769,11 @@ class Matrix
     }
 
     /// <summary>
-    /// Saves the matrix as a text file
+    /// Saves the matrix as a csv file
     /// </summary>
     /// <param name="matrix">the matrix to be saved</param>
     /// <param name="filePath">the file path to save the matrix</param>
-    private static void SaveMatrixText(Matrix matrix, string filePath)
+    private static void SaveMatrixCSV(Matrix matrix, string filePath)
     {
         char delimiter = ',';
         string[] content = new string[matrix.Row];
@@ -1708,7 +1790,6 @@ class Matrix
             // Removes the delimiter at the end of each row
             content[row] = rowData.Substring(0, rowData.Length - 1);
         }
-
         System.IO.File.WriteAllLines(filePath, content);
     }
     #endregion
