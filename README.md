@@ -42,4 +42,3 @@
 
 1. Implement tanh, ReLU function, and their derivatives
 2. Change file save source from txt to csv
-3. Handles infinity in Exp function

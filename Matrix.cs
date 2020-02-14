@@ -285,7 +285,7 @@ class Matrix
             int matBCols = right.Column;
 
             // Checks dimensions
-            if(matACols!=matBRows)
+            if (matACols != matBRows)
             {
                 throw new ArgumentException("Cannot perform matrix dot product on these two matries!");
             }
@@ -881,7 +881,7 @@ class Matrix
     /// <returns>The derivative</returns>
     public static Matrix Sigmoid_Derivative(Matrix A)
     {
-        Matrix derivative = Multiply(A, (1 - A) );
+        Matrix derivative = Multiply(A, (1 - A));
         return derivative;
     }
 
@@ -935,17 +935,17 @@ class Matrix
             {
                 if (Z[row, col] < 0)
                 {
-                    derivative[row,col] = 0;
+                    derivative[row, col] = 0;
                 }
                 else // Z >= 0
                 {
-                    derivative[row,col] = 1;
+                    derivative[row, col] = 1;
                 }
             }
         }
         return derivative;
     }
-    
+
     /// <summary>
     /// Returns the sum of the whole matrix as a 1 x 1 matrix
     /// </summary>
@@ -1080,15 +1080,7 @@ class Matrix
         {
             for (int col = 0; col < matrix.Column; col++)
             {
-                // Handles positive infinity
-                if (double.IsPositiveInfinity(Math.Exp(matrix[row, col])))
-                {
-                    newMatrix[row, col] = double.MaxValue;//e^num    
-                }
-                else
-                {
-                    newMatrix[row, col] = Math.Exp(matrix[row, col]);//e^num
-                }
+                newMatrix[row, col] = Math.Exp(matrix[row, col]);//e^num
             }
         }
         return newMatrix;
