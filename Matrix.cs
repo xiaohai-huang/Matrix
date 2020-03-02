@@ -230,6 +230,7 @@ class Matrix
     {
         _data = matrix.ToDoubleArray();
     }
+    
     /// <summary>
     /// Creates a matrix with random numbers
     /// </summary>
@@ -636,13 +637,8 @@ class Matrix
     /// <returns></returns>
     public static Matrix operator +(Matrix left, Matrix right)
     {
-        Matrix[] ab = BroadCasting(left, right);
-
-        Matrix a = ab[0];
-        Matrix b = ab[1];
-
         Matrix result;
-        result = a.Add(b);
+        result = Add(left,right);
 
         return result;
     }
@@ -713,6 +709,16 @@ class Matrix
         Matrix result = Substract(left, right);
 
         return result;
+    }
+
+    /// <summary>
+    /// Element-wise negative
+    /// </summary>
+    /// <param name="matrix"></param>
+    /// <returns>-matrix</returns>
+    public static Matrix operator -(Matrix matrix)
+    {
+        return -1 * matrix;
     }
 
     /// <summary>
