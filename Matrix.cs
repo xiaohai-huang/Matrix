@@ -1600,9 +1600,9 @@ class Matrix
     /// <summary>
     /// Saves the given dictionary in a folder
     /// </summary>
-    /// <param name="dict">A dictionary containing Matrics</param>
+    /// <param name="dict">A dictionary containing matrices</param>
     /// <param name="folderName">The folder to be saved</param>
-    /// <param name="fileType">the file type to be saved</param>
+    /// <param name="fileType">The file type to be saved</param>
     public static void SaveDict(Dictionary<string, Matrix> dict, string folderName, string fileType)
     {
         if (!System.IO.Directory.Exists(folderName))
@@ -1613,6 +1613,25 @@ class Matrix
         {
             dict[fileName].SaveMatrix(folderName + "/" + fileName + "." + fileType);
         }
+    }
+
+    /// <summary>
+    /// Loads matrices from a folder into a dictionary
+    /// </summary>
+    /// <param name="folderName">The folder which stores matrices</param>
+    /// <returns></returns>
+    public static Dictionary<string, Matrix> LoadDict(string folderName)
+    {
+        string[] fileNames = System.IO.Directory.GetFiles(folderName);
+
+        Dictionary<string,Matrix> dict = new Dictionary<string, Matrix>();
+        foreach (string fileName in fileNames)
+        {
+            Matrix matrix = new Matrix(fileName);
+            string matrixName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+            dict.Add(matrixName,matrix);
+        }
+        return dict;
     }
 
     /// <summary>
