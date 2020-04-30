@@ -230,7 +230,7 @@ class Matrix
     {
         _data = matrix.ToDoubleArray();
     }
-    
+
     /// <summary>
     /// Creates a matrix with random numbers
     /// </summary>
@@ -638,7 +638,7 @@ class Matrix
     public static Matrix operator +(Matrix left, Matrix right)
     {
         Matrix result;
-        result = Add(left,right);
+        result = Add(left, right);
 
         return result;
     }
@@ -876,7 +876,7 @@ class Matrix
     public static Matrix Sigmoid(Matrix Z)
     {
         Matrix A = new Matrix(Z.Shape);
-        A = 1 / (1 + Matrix.Exp(-1 * Z));
+        A = 1 / (1 + Matrix.Exp(-Z));
         return A;
     }
 
@@ -1592,9 +1592,28 @@ class Matrix
     }
 
 
+
     #endregion
 
     #region Matrix Static Methods
+
+    /// <summary>
+    /// Saves the given dictionary in a folder
+    /// </summary>
+    /// <param name="dict">A dictionary containing Matrics</param>
+    /// <param name="folderName">The folder to be saved</param>
+    /// <param name="fileType">the file type to be saved</param>
+    public static void SaveDict(Dictionary<string, Matrix> dict, string folderName, string fileType)
+    {
+        if (!System.IO.Directory.Exists(folderName))
+        {
+            System.IO.Directory.CreateDirectory(folderName);
+        }
+        foreach (string fileName in dict.Keys)
+        {
+            dict[fileName].SaveMatrix(folderName + "/" + fileName + "." + fileType);
+        }
+    }
 
     /// <summary>
     /// Gets the max value of the column according to the given index
