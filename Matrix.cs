@@ -1113,7 +1113,27 @@ class Matrix
     }
 
     /// <summary>
-    /// Element-wise max(left,right)
+    /// Element-wise Square root
+    /// </summary>
+    /// <param name="matrix"></param>
+    /// <returns></returns>
+    public static Matrix Sqrt(Matrix matrix)
+    {
+        Matrix output = new Matrix(matrix.Shape);
+
+        for (int row = 0; row < matrix.Row; row++)
+        {
+            for (int col = 0; col < matrix.Column; col++)
+            {
+                output[row, col] = Math.Sqrt(matrix[row, col]);
+            }
+        }
+
+        return output;
+    }
+
+    /// <summary>
+    /// Element-wise Max(left,right)
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -1134,7 +1154,7 @@ class Matrix
     }
 
     /// <summary>
-    /// Element-wise max(left,right)
+    /// Element-wise Max(left,right)
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
